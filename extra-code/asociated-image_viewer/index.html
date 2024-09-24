@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Viewer</title>
+    <link rel="stylesheet" href="pico-1.5.11/pico-1.5.11/css/pico.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            overflow-x: auto;
+            margin: 0;
+            padding: 0;
+        }
+
+        #image-container {
+            white-space: nowrap;
+            text-align: left;
+            font-size: 0; /* Remove whitespace between inline-block elements */
+            max-height: 100vh; /* Set maximum height to the viewport height */
+            overflow-y: hidden; /* Hide vertical scrollbar */
+        }
+
+        .image-wrapper {
+            display: inline-block;
+            margin: 5px;
+            padding: 2px;
+            max-width: 50%;
+            max-height: 50%;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        img {
+            max-width: 90%;
+            max-height: 90%;
+            width: auto;
+            height: auto;
+        }
+
+        .main-image{
+            border: 4px solid green;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <label for="image-input">Enter image filename:</label>
+        <input type="text" id="image-input">
+        <button onclick="loadImage()">Load Image</button>
+    </main>
+
+    <div id="image-container"></div>
+
+
+    <script type="text/javascript" src="json_data.js"></script> 
+    <script>
+        const json_object = JSON.parse(json_str)
+
+        function loadImage() {
+            image_folder = "cap-images/";
+            // Get the input value
+            var imageName = document.getElementById('image-input').value;
+
+            // Create a wrapper for the image
+            var imageWrapper = document.createElement('div');
+            imageWrapper.className = 'image-wrapper';
+
+            for (let key in json_object){
+                image_array = key.split(",")
+                if(image_array.indexOf(imageName) != -1){
+                    console.log("Found yay!")
+                    image_array.forEach(img => {
+                        console.log(img)
+                        var imgElement = document.createElement('img');
+                        
+                        if(img){
+                            imgElement.src = image_folder + img;
+                            if(img === imageName){
+                                console.log("ran")
+                                imgElement.className = "main-image"
+                            }
+                            // else{
+                            //     imgElement.style.border = ""
+                            // }
+                            imageWrapper.appendChild(imgElement);
+                        
+                            imgElement.onerror = function() {
+                                alert('Image not found!');
+                            };
+                        }
+
+                    });
+                    // const value = json_object[key]
+                    // console.log(value)
+                }
+            }
+            // Append the image wrapper to the container
+            image_container = document.getElementById('image-container');
+
+            // Clear the contents of the container
+            image_container.innerHTML = '';
+
+            image_container.appendChild(imageWrapper);
+        }
+    </script>
+
+</body>
+</html>
