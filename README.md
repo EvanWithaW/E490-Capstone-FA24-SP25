@@ -7,6 +7,12 @@
 git clone https://github.com/SotaroKaneda/CapstoneLPR.git  
 ```
 ### Install Dependencies  
+
+Mac Users Only: **ENSURE YOU HAVE CMAKE INSTALLED**
+This can be done with Homebrew:  
+```
+brew install cmake
+```
 *Tested with Python>=3.8.0, and PyTorch>=1.8*  
 ```
 cd CapstoneLPR
