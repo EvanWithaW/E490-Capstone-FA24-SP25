@@ -210,6 +210,8 @@ def get_crops_chars(model_output, image):
     """
         Returns a list of sorted character image crops
     """
+
+    # we can use model_output.conf to get the confidence of the predicted bounding box coordinates
     char_list = []
     for prediction in model_output.xyxy:
         if prediction.numel() == 0:    
