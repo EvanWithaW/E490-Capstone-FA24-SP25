@@ -4,6 +4,7 @@ import glob
 import cv2
 import math
 
+## this is for their old kaggle dataset.
 def xml_to_yolo_annotations(folder):
     output_dir = 'kaggle_LP_dataset_yolo/annotations'
     files = glob.glob(os.path.join(folder, '*.xml'))

@@ -71,15 +71,14 @@ def copy_files(from_folder, to_folder):
 # print(len(X_train))
 # print(len(X_test))
 
-images_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\train-test-images"
-labels_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\train-test-plate-labels"
-train_images_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-LP\train\images"
-train_labels_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-LP\train\labels"
-val_images_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-LP\val\images"
-val_labels_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-LP\val\labels"
-test_images_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-LP\test\images"
-test_labels_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-LP\test\labels"
-label_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\train-test-plate-labels"
+images_folder = "/Users/evanw/Desktop/CapstoneDataset/"
+labels_folder = "/Users/evanw/Desktop/LP-Real-Labels/"
+train_images_folder = "/Users/evanw/Desktop/yoloDataset/train/images"
+train_labels_folder = "/Users/evanw/Desktop/yoloDataset/train/labels"
+val_images_folder = "/Users/evanw/Desktop/yoloDataset/val/images"
+val_labels_folder = "/Users/evanw/Desktop/yoloDataset/val/labels"
+test_images_folder = "/Users/evanw/Desktop/yoloDataset/test/images"
+test_labels_folder = "/Users/evanw/Desktop/yoloDataset/test/labels"
 X = np.array(os.listdir(images_folder))
 y = np.array(os.listdir(images_folder))
 X_val_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, shuffle=True, random_state=42)
@@ -87,13 +86,13 @@ X_train, X_val, y1, y2 = train_test_split(X_val_train, X_val_train, test_size=0.
 # print(len(X_train), len(X_val))
 
 for image in X_train:
-    shutil.copy2(os.path.join(images_folder, image), os.path.join(train_folder, image))
+    shutil.copy2(os.path.join(images_folder, image), os.path.join(train_images_folder, image))
 
 for image in X_val:
-    shutil.copy2(os.path.join(images_folder, image), os.path.join(val_folder, image))
+    shutil.copy2(os.path.join(images_folder, image), os.path.join(val_images_folder, image))
 
 for image in X_test:
-    shutil.copy2(os.path.join(images_folder, image), os.path.join(test_folder, image))
+    shutil.copy2(os.path.join(images_folder, image), os.path.join(test_images_folder, image))
 
 
 # labels
@@ -111,9 +110,9 @@ def copy_txt_files(image_files, from_folder, to_folder):
         if os.path.exists(txt_path):
             shutil.copy2(txt_path, os.path.join(to_folder, txt_file))
 
-# copy_txt_files(train_images, labels_folder, train_labels_folder)
-# copy_txt_files(val_images, labels_folder, val_labels_folder)
-# copy_txt_files(test_images, labels_folder, test_labels_folder)
+copy_txt_files(train_images, labels_folder, train_labels_folder)
+copy_txt_files(val_images, labels_folder, val_labels_folder)
+copy_txt_files(test_images, labels_folder, test_labels_folder)
 
 # txt_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\NO-LP\has-lp"
 # txt_files = os.listdir(txt_folder)
