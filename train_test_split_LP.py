@@ -72,13 +72,13 @@ def copy_files(from_folder, to_folder):
 # print(len(X_test))
 
 images_folder = "/Users/evanw/Desktop/CapstoneDataset/"
-labels_folder = "/Users/evanw/Desktop/LP-Real-Labels/"
-train_images_folder = "/Users/evanw/Desktop/yoloDataset/train/images"
-train_labels_folder = "/Users/evanw/Desktop/yoloDataset/train/labels"
-val_images_folder = "/Users/evanw/Desktop/yoloDataset/val/images"
-val_labels_folder = "/Users/evanw/Desktop/yoloDataset/val/labels"
-test_images_folder = "/Users/evanw/Desktop/yoloDataset/test/images"
-test_labels_folder = "/Users/evanw/Desktop/yoloDataset/test/labels"
+labels_folder = "/Users/evanw/Desktop/Char-Real-Labels/"
+train_images_folder = "/Users/evanw/Desktop/yoloCharDataset/train/images"
+train_labels_folder = "/Users/evanw/Desktop/yoloCharDataset/train/labels"
+val_images_folder = "/Users/evanw/Desktop/yoloCharDataset/val/images"
+val_labels_folder = "/Users/evanw/Desktop/yoloCharDataset/val/labels"
+test_images_folder = "/Users/evanw/Desktop/yoloCharDataset/test/images"
+test_labels_folder = "/Users/evanw/Desktop/yoloCharDataset/test/labels"
 X = np.array(os.listdir(images_folder))
 y = np.array(os.listdir(images_folder))
 X_val_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, shuffle=True, random_state=42)
