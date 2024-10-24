@@ -99,7 +99,7 @@ def check_results(results_path, label_dict):
 
             if check_for_special(label, pred):
                 correct += 1
-            else:         
+            else:
                 if pred == label:
                     correct += 1
                 else:
@@ -155,8 +155,8 @@ else:
     if not os.path.exists(results_path):
         print("Results file path incorrect.")
         sys.exit()
-    label_dict = {}
-    label_file_path = "data-11-30.csv"
+    # label_dict = {}
+    label_file_path = "../../../../CapstoneLabelFiles/ALPRPlateExport11-30-23.csv"
     with open(label_file_path, "r") as file:
         label_dict = utils.create_label_dict(file.readlines())
 

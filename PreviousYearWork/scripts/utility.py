@@ -239,7 +239,7 @@ def predict_chars(character_crops, classifier, transforms, device):
     pred_str = ""
     with torch.no_grad():
         for char_image in character_crops:
-            char_image = image = transforms(image=char_image)["image"]
+            char_image = transforms(image=char_image)["image"]
             char_image = char_image.unsqueeze(0).to(device)
             char_pred = classifier(char_image)
             values, real = torch.max(char_pred, 1)
@@ -373,13 +373,16 @@ def parse_csv(file_handle):
     return (headers, data, num_records)
 
 def create_label_dict(file_lines):
-    headers = file_lines[0].split(",")[:-1]
+    headers = file_lines[0].split(",")
+    for header in headers:
+        header = header.strip('\n')
     data = file_lines[1:]
     label_dict = {}
     for line in data:
-        UFM_ID,TXN_TIME,TOLLZONE_ID,LANE_POSITION,PLATE_TYPE,PLATE_TYPE_CONFIDENCE,PLATE_READ,PLATE_RDR_CONFIDENCE, \
-        PLATE_JURISDICTION,IR_DISPOSITIONED,PAYMENT_METHOD,IMAGE1,IMAGE2,IMAGE3,IMAGE4,TYPE1,TYPE2,TYPE3,TYPE4 = line.split(",")[:-1]
+       # print(line.split(","))
+        UFM_ID,TXN_TIME,TOLLZONE_ID,LANE_POSITION,PLATE_TYPE,PLATE_TYPE_CONFIDENCE,PLATE_READ,PLATE_RDR_CONFIDENCE,IR_DISPOSITIONED,PAYMENT_METHOD,IMAGE1,IMAGE2,IMAGE3,IMAGE4,TYPE1,TYPE2,TYPE3,TYPE4 = line.split(",")
         for image in [IMAGE1, IMAGE2, IMAGE3, IMAGE4]:
-            if image != "None":
-                label_dict[image.split(".")[0]] = PLATE_READ
+            if image != "" and image != '\n':
+                imagewithoutsuffix = image.split('.')[2].split('/')[6]
+                label_dict[imagewithoutsuffix] = PLATE_READ
     return label_dict

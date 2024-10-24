@@ -23,14 +23,14 @@ lp_weights = os.path.join("weights", "lp-detect.pt")
 char_weights = os.path.join("weights", "char-detect.pt")
 resnet_weights = os.path.join("weights", "resnet-classifier.pth")
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-lp_model = torch.hub.load('ultralytics/yolov5', 'custom', lp_weights)#, force_reload=True)
+device = torch.device("cpu")
+lp_model = torch.hub.load('ultralytics/yolov5', 'custom', lp_weights,map_location=device)#, force_reload=True)
 char_model = torch.hub.load('ultralytics/yolov5', 'custom', char_weights)#, force_reload=True)
 
 resnet_classifier = CharacterModel()
 ### to run on the cpu
 # resnet_classifier.load_state_dict(torch.load(resnet_weights, map_location=torch.device('cpu')))
-resnet_classifier.load_state_dict(torch.load(resnet_weights))
+resnet_classifier.load_state_dict(torch.load(resnet_weights,map_location=device))
 lp_model.eval()
 char_model.eval()
 resnet_classifier.eval()
