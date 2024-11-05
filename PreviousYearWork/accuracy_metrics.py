@@ -1,7 +1,5 @@
-import shutil
 import os
 import sys
-import json
 import scripts.utility as utils
 from difflib import SequenceMatcher as SM
 

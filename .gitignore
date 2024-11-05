@@ -1,6 +1,4 @@
 /PreviousYearWork/weights/
-*.csv
-*.pt
-*.onnx
-*.engine
 runs/
+/modelWeights/
+*.csv

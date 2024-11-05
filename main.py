@@ -1,0 +1,121 @@
+import torch
+import os
+import cv2
+import sys
+import glob
+import datetime
+import numpy as np
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+# from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+from ultralytics import YOLO
+import LPutility
+import time
+
+
+# Path issue fix: https://stackoverflow.com/questions/57286486/i-cant-load-my-model-because-i-cant-put-a-posixpath
+temp = ""
+if sys.platform == "win32":
+    import pathlib
+    temp = pathlib.PosixPath
+    pathlib.PosixPath = pathlib.WindowsPath
+
+lp_weights = os.path.join("modelWeights", "LPbest.pt")
+char_weights = os.path.join("modelWeights", "Charbest.pt")
+# resnet_weights = os.path.join("weights", "resnet-classifier.pth")
+
+device = torch.device("mps")
+lp_model = YOLO(lp_weights)
+char_model = YOLO(char_weights)
+
+### to run on the cpu
+# resnet_classifier.load_state_dict(torch.load(resnet_weights, map_location=torch.device('cpu')))
+# lp_model.eval()
+# char_model.eval()`
+lp_model.to(device)
+char_model.to(device)
+
+image_size = 32
+transforms = A.Compose([
+        # A.Affine(shear={"x":15}, p=1.0),
+        A.LongestMaxSize(max_size=image_size),
+        A.PadIfNeeded(
+            min_height=image_size,
+            min_width=image_size,
+            border_mode=cv2.BORDER_CONSTANT,
+            value=(0, 0, 0),
+        ),
+        A.Normalize(
+            mean=[0, 0, 0],
+            std=[1, 1, 1],
+            max_pixel_value=255,
+        ),
+        ToTensorV2()
+    ])
+
+
+# image_paths = glob.glob(os.path.join(r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-LP\test\images", "*"))
+image_paths = []
+if len(sys.argv) < 2:
+    print("Missing Argument: image or images folder path")
+
+path = sys.argv[1]
+if os.path.isfile(path):
+    image_paths = [path]
+elif os.path.isdir(path):
+    image_paths = glob.glob(os.path.join(path, "*"))
+
+if not os.path.isdir("model-runs"):
+    os.mkdir("model-runs")
+
+timestamp = str(datetime.datetime.now())
+date, time = timestamp.split(".")[0].split(" ")
+time = time.replace(":", "-")
+filename = f"Run---{date}---{time}.csv"
+count = 0
+with open(os.path.join("model-runs", filename), "w") as file:
+    file.write("PRED,IMAGE\n")
+    for image_path in image_paths:
+        base, image_name = os.path.split(image_path)
+        name, ext = os.path.splitext(image_name)
+        image = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+        # lp_pred = lp_model(image)
+        lp_pred = lp_model(image,verbose=False)
+
+    # lp_pred[0].show()
+        lp_crop = LPutility.get_crop_lp(lp_pred, image)
+
+        # debugging
+        # cv2.imshow("Cropped Image", lp_crop)
+        # cv2.waitKey(0)
+
+        if lp_crop.size > 0:
+            # invert the image
+            # inverted = ~lp_crop
+            # histogram equalize the image
+            # he = LPutility.HE(lp_crop)
+            # invert the histogram equalized image
+            # inv_he = LPutility.HE(inverted)
+            # run character detection on the inverted histogram equalized image This had the best results for detecting characters on plates.
+
+            # char_pred = char_model(lp_crop)
+            char_pred = char_model(lp_crop,verbose=False)
+
+            pred = LPutility.directPredict(char_pred)
+            # print(pred)
+            # cv2.imshow("Cropped Image", lp_crop)
+            # cv2.waitKey(0)
+            # time.wait(500)
+            # pred = utils.predict_chars(char_crops, transforms=transforms, device=device)
+            file.write(f"{pred},{name}\n")
+            count += 1
+            if count % 1000 == 0:
+                # end = time.time()
+                # print("Time spent avg",end-start/count)
+                # start = time.time()
+                print(f"Finished prediction {count}")
+print(f"Results written to model-runs/{filename}")        
+
+if sys.platform == "win32":
+    pathlib.PosixPath = temp
+        
