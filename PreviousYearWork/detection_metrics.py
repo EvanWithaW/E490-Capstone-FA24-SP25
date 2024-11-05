@@ -3,9 +3,6 @@ import os
 import cv2
 import scripts.utility as utils
 from torchvision import ops
-import numpy as np
-import math
-import sys
 
 
 def get_iou(prediction_box, ground_truth_box):

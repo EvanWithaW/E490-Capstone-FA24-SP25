@@ -8,10 +8,10 @@ import torch
 import glob
 import os
 
-model = torch.hub.load('ultralytics/yolov5', 'custom', 'yolov5/runs/train/exp4/weights/best.pt')
+model = torch.hub.load('ultralytics/yolov5', 'custom', 'yolov5/runs/train/exp4/weights/LPbest.pt')
 
 # load trained weights
-# model.load_state_dict(torch.load('yolov5/runs/train/exp4/weights/best.pt')['model'].state_dict())
+# model.load_state_dict(torch.load('yolov5/runs/train/exp4/weights/LPbest.pt')['model'].state_dict())
 
 # set for inference
 model.eval()    
