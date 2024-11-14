@@ -24,7 +24,16 @@ lp_weights = os.path.join("modelWeights", "LPbest.pt")
 char_weights = os.path.join("modelWeights", "Charbest.pt")
 # resnet_weights = os.path.join("weights", "resnet-classifier.pth")
 
-device = torch.device("mps")
+# device = torch.device("mps")
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+elif torch.cuda.is_available():
+    device = torch.device("cuda:0")
+else:
+    device = torch.device("cpu")
+
+print(f"Using device: {device}")
+
 lp_model = YOLO(lp_weights)
 char_model = YOLO(char_weights)
 
