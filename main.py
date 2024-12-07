@@ -11,6 +11,7 @@ from albumentations.pytorch import ToTensorV2
 from ultralytics import YOLO
 import LPutility
 import time
+import Image_Preprocessing
 
 
 # Path issue fix: https://stackoverflow.com/questions/57286486/i-cant-load-my-model-because-i-cant-put-a-posixpath
@@ -85,8 +86,10 @@ with open(os.path.join("model-runs", filename), "w") as file:
     # lp_pred[0].show()
         lp_crop = LPutility.get_crop_lp(lp_pred, image)
 
-        # debugging
-        # cv2.imshow("Cropped Image", lp_crop)
+        lp_crop_processed = Image_Preprocessing.process(lp_crop)
+
+    # debugging
+        # cv2.imshow("Cropped Image", lp_crop_processed)
         # cv2.waitKey(0)
 
         if lp_crop.size > 0:
@@ -98,8 +101,8 @@ with open(os.path.join("model-runs", filename), "w") as file:
             # inv_he = LPutility.HE(inverted)
             # run character detection on the inverted histogram equalized image This had the best results for detecting characters on plates.
 
-            # char_pred = char_model(lp_crop)
-            char_pred = char_model(lp_crop,verbose=False)
+            char_pred = char_model(lp_crop)
+            # char_pred = char_model(lp_crop_processed,verbose=False)
 
             pred = LPutility.directPredict(char_pred)
             # print(pred)

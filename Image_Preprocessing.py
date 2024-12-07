@@ -51,7 +51,6 @@ def process(image):
         deblurred = cv2.addWeighted(clahe_output, 2.0, gaussian, -0.5, 0)
     # Normalize deblurred image
     deblurred = cv2.normalize(deblurred, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-    # 090009_1701092969862R05_651.jpg
 
     return deblurred
 
