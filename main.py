@@ -10,7 +10,7 @@ from albumentations.pytorch import ToTensorV2
 # from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 from ultralytics import YOLO
 import LPutility
-import time
+import time as tm
 
 
 # Path issue fix: https://stackoverflow.com/questions/57286486/i-cant-load-my-model-because-i-cant-put-a-posixpath
@@ -82,22 +82,45 @@ date, time = timestamp.split(".")[0].split(" ")
 time = time.replace(":", "-")
 filename = f"Run---{date}---{time}.csv"
 count = 0
+loadingImageTimes = []
+predictingLPTimes = []
+croppingLPTimes = []
+predictingCharTimes = []
+globalrunTimes = []
 with open(os.path.join("model-runs", filename), "w") as file:
     file.write("PRED,IMAGE\n")
     for image_path in image_paths:
+        startglobal = tm.time()
+        start = tm.time()
         base, image_name = os.path.split(image_path)
         name, ext = os.path.splitext(image_name)
         image = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+        end = tm.time()
+        loadingImageTimes.append(end-start)
+        # print("Time spent loading image",end-start)
+
+        start = tm.time()
         # lp_pred = lp_model(image)
         lp_pred = lp_model(image,verbose=False)
+        end = tm.time()
+        predictingLPTimes.append(end-start)
+
+        # print("Time spent predicting LP",end-start)
+
+
 
     # lp_pred[0].show()
+        start = tm.time()
         lp_crop = LPutility.get_crop_lp(lp_pred, image)
+        end = tm.time()
+        croppingLPTimes.append(end-start)
+        # print("Time spent cropping LP",end-start)
 
         # debugging
         # cv2.imshow("Cropped Image", lp_crop)
         # cv2.waitKey(0)
 
+        ## so if this doesnt pass through then there was no license plate found in that photo.
         if lp_crop.size > 0:
             # invert the image
             # inverted = ~lp_crop
@@ -107,10 +130,15 @@ with open(os.path.join("model-runs", filename), "w") as file:
             # inv_he = LPutility.HE(inverted)
             # run character detection on the inverted histogram equalized image This had the best results for detecting characters on plates.
 
+            start = tm.time()
             # char_pred = char_model(lp_crop)
             char_pred = char_model(lp_crop,verbose=False)
 
             pred = LPutility.directPredict(char_pred)
+            end = tm.time()
+            predictingCharTimes.append(end-start)
+            # print("Time spent predicting characters",end-start)
+            # print("----")
             # print(pred)
             # cv2.imshow("Cropped Image", lp_crop)
             # cv2.waitKey(0)
@@ -118,11 +146,20 @@ with open(os.path.join("model-runs", filename), "w") as file:
             # pred = utils.predict_chars(char_crops, transforms=transforms, device=device)
             file.write(f"{pred},{name}\n")
             count += 1
+            endglobal = tm.time()
+            globalrunTimes.append(endglobal-startglobal)
             if count % 1000 == 0:
                 # end = time.time()
                 # print("Time spent avg",end-start/count)
                 # start = time.time()
                 print(f"Finished prediction {count}")
+                print(f"""
+                Average time loading image: {sum(loadingImageTimes)/len(loadingImageTimes)}
+                Average time predicting LP: {sum(predictingLPTimes)/len(predictingLPTimes)}
+                Average time cropping LP: {sum(croppingLPTimes)/len(croppingLPTimes)}
+                Average time predicting Char: {sum(predictingCharTimes)/len(predictingCharTimes)}
+                Average time running everything: {sum(globalrunTimes)/len(globalrunTimes)}
+                """)
 print(f"Results written to model-runs/{filename}")        
 
 if sys.platform == "win32":
