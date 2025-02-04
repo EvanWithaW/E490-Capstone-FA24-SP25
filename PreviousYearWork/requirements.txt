@@ -35,7 +35,7 @@ multidict==6.0.5
 multiprocess==0.70.16
 networkx==3.2.1
 numpy==1.26.4
-onnx==1.15.0
+onnx==1.16.2
 onnxscript==0.1.0.dev20240315
 opencv-python==4.9.0.80
 opencv-python-headless==4.9.0.80
