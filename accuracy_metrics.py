@@ -154,7 +154,7 @@ else:
         print("Results file path incorrect.")
         sys.exit()
     # label_dict = {}
-    label_file_path = "../../../../CapstoneLabelFiles/ALPRPlateExport11-30-23.csv"
+    label_file_path = "../../../CapstoneLabelFiles/ALPRPlateExport11-30-23.csv"
     with open(label_file_path, "r") as file:
         label_dict = utils.create_label_dict(file.readlines())
 
