@@ -88,7 +88,7 @@ croppingLPTimes = []
 predictingCharTimes = []
 globalrunTimes = []
 with open(os.path.join("model-runs", filename), "w") as file:
-    file.write("PRED,IMAGE\n")
+    file.write("PRED,IMAGE,CONF\n")
     for image_path in image_paths:
         startglobal = tm.time()
         start = tm.time()
@@ -134,7 +134,8 @@ with open(os.path.join("model-runs", filename), "w") as file:
             # char_pred = char_model(lp_crop)
             char_pred = char_model(lp_crop,verbose=False)
 
-            pred = LPutility.directPredict(char_pred)
+            pred, conf = LPutility.directPredict(char_pred)
+            conf = (conf.float()*1000).int().item()
             end = tm.time()
             predictingCharTimes.append(end-start)
             # print("Time spent predicting characters",end-start)
@@ -144,7 +145,8 @@ with open(os.path.join("model-runs", filename), "w") as file:
             # cv2.waitKey(0)
             # time.wait(500)
             # pred = utils.predict_chars(char_crops, transforms=transforms, device=device)
-            file.write(f"{pred},{name}\n")
+            # print(f"CONF: {conf}")
+            file.write(f"{pred},{name},{conf}\n")
             count += 1
             endglobal = tm.time()
             globalrunTimes.append(endglobal-startglobal)

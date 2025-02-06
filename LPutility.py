@@ -232,14 +232,17 @@ labels = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ"
 def directPredict(yoloPrediction):
     strVal = ""
     boxesLst= []
+    charLst= []
     for prediction in yoloPrediction:
         for charPred in prediction.boxes:
             boxesLst.append((int(charPred.cls),charPred.xyxy[0].tolist()[:4]))
             boxesLst.sort(key=lambda box: box[1][0])
+            print("Char pred: ",charPred.conf)
+            charLst.append(charPred.conf)
             # vertical_sort(boxesLst)
     for box in boxesLst:
         strVal += labels[box[0]]
-    return strVal
+    return strVal, min(charLst)
 
 def predict_chars(character_crops, classifier, transforms, device):
     """
