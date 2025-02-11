@@ -82,6 +82,8 @@ def check_results_capstone(prediction_path):
 def check_results(results_path, label_dict):
     correct = 0
     incorrect = 0
+    manual = 0
+    auto = 0
     num_records = 0
     different_length = 0
     incorrect_but_train = 0
@@ -91,23 +93,29 @@ def check_results(results_path, label_dict):
             label = ""
             image = ""
             pred = ""
+            conf = ""
             split_line = line.strip().split(",")
-            pred, image = split_line
+            pred, image, conf = split_line
             label = label_dict[image]
-
-            if check_for_special(label, pred):
-                correct += 1
+            
+            if int(conf) < 900:
+                manual += 1
+                num_records-=1
             else:
-                if pred == label:
+                auto +=1
+                if check_for_special(label, pred):
                     correct += 1
                 else:
-                    incorrect += 1
-                    percent_incorrect = SM(None, label, pred).ratio() * 100
-                    if (len(pred) == len(label)) and (percent_incorrect > 70):
-                        incorrect_but_train += 1
-                    elif (len(pred) != len(label)):
-                        different_length += 1
-    return (correct, incorrect, num_records, different_length, incorrect_but_train)
+                    if pred == label:
+                        correct += 1
+                    else:
+                        incorrect += 1
+                        percent_incorrect = SM(None, label, pred).ratio() * 100
+                        if (len(pred) == len(label)) and (percent_incorrect > 70):
+                            incorrect_but_train += 1
+                        elif (len(pred) != len(label)):
+                            different_length += 1
+    return (correct, incorrect, num_records, different_length, incorrect_but_train, manual, auto)
 
                     
 if len(sys.argv) < 2:
@@ -154,18 +162,23 @@ else:
         print("Results file path incorrect.")
         sys.exit()
     # label_dict = {}
-    label_file_path = "../../../../CapstoneLabelFiles/ALPRPlateExport11-30-23.csv"
+    # label_file_path = "../../../../CapstoneLabelFiles/ALPRPlateExport11-30-23.csv"
+    label_file_path = "../../ALPRPlateExport11-30-23.csv"
     with open(label_file_path, "r") as file:
         label_dict = utils.create_label_dict(file.readlines())
 
-    correct, incorrect, num_records, different_length, incorrect_but_train = check_results(results_path, label_dict)
+    correct, incorrect, num_records, different_length, incorrect_but_train, manual_cnt, auto_cnt = check_results(results_path, label_dict)
     
     print("Results")
     print("------------------------")
-    print(f"Percentage chars correct: {(correct / num_records) * 100 :0.5f}%")
+    print(f"Auto Percentage chars correct: {(correct / num_records) * 100 :0.5f}%")
     print(f"{correct}/{num_records}")
     print()
     print("Incorrect: ", incorrect)
     print("Different Length: ", different_length)
+    print("------------------------")
+    print(f"Manual: {manual_cnt}")
+    print(f"Auto: {auto_cnt}")
+    print(f"Automation Rate: {auto_cnt/(auto_cnt+manual_cnt)*100 :0.5f}%")
     print("------------------------")
     # print("Incorrect but train: ", incorrect_but_train)
