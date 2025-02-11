@@ -1,6 +1,6 @@
 import os
 import sys
-import scripts.utility as utils
+import PreviousYearWork.scripts.utility as utils
 from difflib import SequenceMatcher as SM
 
 
@@ -154,7 +154,10 @@ else:
         print("Results file path incorrect.")
         sys.exit()
     # label_dict = {}
-    label_file_path = "../../../CapstoneLabelFiles/ALPRPlateExport11-30-23.csv"
+    label_file_path = input("FULL path for total label file :")
+    if label_file_path == "":
+        label_file_path = "/Users/evanw/Desktop/CapstoneLabelFiles/ALPRPlateExport11-30-23.csv"
+        print("Overriding blank label file.")
     with open(label_file_path, "r") as file:
         label_dict = utils.create_label_dict(file.readlines())
 
