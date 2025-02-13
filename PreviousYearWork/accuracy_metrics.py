@@ -98,7 +98,7 @@ def check_results(results_path, label_dict):
             pred, image, conf = split_line
             label = label_dict[image]
             
-            if int(conf) < 900:
+            if int(conf) < 920:
                 manual += 1
                 num_records-=1
             else:
@@ -169,16 +169,17 @@ else:
 
     correct, incorrect, num_records, different_length, incorrect_but_train, manual_cnt, auto_cnt = check_results(results_path, label_dict)
     
+    print("------------------------------------------")
     print("Results")
-    print("------------------------")
-    print(f"Auto Percentage chars correct: {(correct / num_records) * 100 :0.5f}%")
-    print(f"{correct}/{num_records}")
+    print("------------------------------------------")
+    print(f"Auto Percentage LPs correct: {(correct / num_records) * 100 :0.5f}%")
+    print(f"Automation Rate: {auto_cnt/(auto_cnt+manual_cnt)*100 :0.5f}%")
+    print(f"Auto Correct/Total: {correct}/{num_records}")
     print()
     print("Incorrect: ", incorrect)
     print("Different Length: ", different_length)
-    print("------------------------")
-    print(f"Manual: {manual_cnt}")
-    print(f"Auto: {auto_cnt}")
-    print(f"Automation Rate: {auto_cnt/(auto_cnt+manual_cnt)*100 :0.5f}%")
-    print("------------------------")
+    print()
+    print(f"LPs Auto Predicted: {auto_cnt}")
+    print(f"LPs Sent off to Manual Review: {manual_cnt}")
+    print("------------------------------------------")
     # print("Incorrect but train: ", incorrect_but_train)

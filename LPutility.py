@@ -242,6 +242,9 @@ def directPredict(yoloPrediction):
             # vertical_sort(boxesLst)
     for box in boxesLst:
         strVal += labels[box[0]]
+    
+    if not charLst:
+        return strVal, torch.tensor(0.0)
     return strVal, min(charLst)
 
 def predict_chars(character_crops, classifier, transforms, device):
