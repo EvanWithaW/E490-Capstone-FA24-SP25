@@ -98,7 +98,7 @@ def check_results(results_path, label_dict):
             pred, image, conf = split_line
             label = label_dict[image]
             
-            if int(conf) < 917:
+            if int(conf) < 900:
                 manual += 1
                 num_records-=1
             else:
