@@ -5,6 +5,7 @@ from sklearn.utils.random import sample_without_replacement
 
 maximum = 30000
 save_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR-CLASSIFY\train"
+# these are the characters that we are using for training as well. add in LPD.yaml
 characters = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ"
 for char in characters:
     num_chars = 0
