@@ -26,7 +26,7 @@ for key,val in ufm_dict.items():
 # for each image in every ufm id row, search the results dict for matching image, if/when found, append (pred, conf) to the new ufm dict. now we have up to 4 pred,conf pairs for every row
 
 sorted_results_dict = {} # (ufm_id, [(prediction, conf),(prediction, conf),...]) for each available image angle
-for ufm_id, vals in ufm_dict.items(): # val is image1: name, image2: name, etc. and also has plate read
+for ufm_id, vals in ufm_dict.items(): # val is image1: name, image2: name, etc. and plate read
     for key2, val2 in vals.items():
         if key2.startswith("IMAGE"):
             image_id = vals[key2]
@@ -35,7 +35,7 @@ for ufm_id, vals in ufm_dict.items(): # val is image1: name, image2: name, etc. 
 
 # print(next(iter(sorted_results_dict.items())))    
 
-filtered_results_dict = {} # each ufm_id row with only the highest confidence for the pred,conf pairs
+filtered_results_dict = {} # each ufm_id row with only the highest confidence for the (pred,conf) pairs
 for ufm_id, tuples in sorted_results_dict.items():
     filtered_results_dict[ufm_id] = max(tuples, key=lambda x: x[1])
 
