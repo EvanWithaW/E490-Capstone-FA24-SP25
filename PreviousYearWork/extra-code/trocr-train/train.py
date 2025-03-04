@@ -1,14 +1,15 @@
-import torch
-from torch.utils.data import DataLoader
-from transformers import VisionEncoderDecoderModel
-from transformers import TrOCRProcessor
 import os
+
 import pandas as pd
-from torch.utils.data import Dataset
+import torch
 from PIL import Image
-from sklearn.model_selection import train_test_split
 from datasets import load_metric
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
 from transformers import AdamW
+from transformers import TrOCRProcessor
+from transformers import VisionEncoderDecoderModel
 
 
 def compute_cer(pred_ids, label_ids):
@@ -18,6 +19,7 @@ def compute_cer(pred_ids, label_ids):
 
     cer = cer_metric.compute(predictions=pred_str, references=label_str)
     return cer
+
 
 class LPRDataset(Dataset):
     def __init__(self, root_dir, df, processor, max_target_length=128):
@@ -37,8 +39,8 @@ class LPRDataset(Dataset):
         image = Image.open(os.path.join(self.root_dir, file_name)).convert("RGB")
         pixel_values = self.processor(image, return_tensors="pt").pixel_values
         # add labels (input_ids) by encoding the text
-        labels = self.processor.tokenizer(text, 
-                                          padding="max_length", 
+        labels = self.processor.tokenizer(text,
+                                          padding="max_length",
                                           max_length=self.max_target_length).input_ids
         # important: make sure that PAD tokens are ignored by the loss function
         labels = [label if label != self.processor.tokenizer.pad_token_id else -100 for label in labels]
@@ -47,13 +49,11 @@ class LPRDataset(Dataset):
         return encoding
 
 
-
-
 # slate_dataset_path = '/N/slate/jdmckean/TRAIN-LP/train/images'
 slate_dataset_path = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\trocr-train"
 df = pd.read_csv('train-set.csv', usecols=["text", "file_name"])
 df.columns = ["text", "file_name"]
-df['file_name'] = df['file_name'].apply(lambda x: x + '.png')	#add 'png' to all file names
+df['file_name'] = df['file_name'].apply(lambda x: x + '.png')  # add 'png' to all file names
 print(df.head())
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -64,7 +64,7 @@ processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-printed")
 model.to(device)
 
 # test train spilit with random seed to get the same split everytime
-train_df, test_df = train_test_split(df, test_size=0.2, random_state = 1)
+train_df, test_df = train_test_split(df, test_size=0.2, random_state=1)
 # we reset the indices to start from zero
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
@@ -73,10 +73,8 @@ train_dataset = LPRDataset(root_dir=slate_dataset_path,
                            df=train_df,
                            processor=processor)
 eval_dataset = LPRDataset(root_dir=slate_dataset_path,
-                           df=test_df,
-                           processor=processor)
-     
-
+                          df=test_df,
+                          processor=processor)
 
 print("Number of training examples:", len(train_dataset))
 print("Number of validation examples:", len(eval_dataset))
@@ -111,7 +109,7 @@ for epoch in range(45):  # loop over the dataset multiple times
     train_loss = 0.0
     for batch in train_dataloader:
         # get the inputs
-        for k,v in batch.items():
+        for k, v in batch.items():
             batch[k] = v.to(device)
         # forward + backward + optimize
         outputs = model(**batch)
@@ -122,9 +120,9 @@ for epoch in range(45):  # loop over the dataset multiple times
         train_loss += loss.item()
         break
 
-    print(f"Loss after epoch {epoch}:", train_loss/len(train_dataloader))
-    
-            # evaluate
+    print(f"Loss after epoch {epoch}:", train_loss / len(train_dataloader))
+
+    # evaluate
     model.eval()
     valid_cer = 0.0
     with torch.no_grad():
@@ -133,7 +131,7 @@ for epoch in range(45):  # loop over the dataset multiple times
             outputs = model.generate(batch["pixel_values"].to(device))
             # compute metrics
             cer = compute_cer(pred_ids=outputs, label_ids=batch["labels"])
-            valid_cer += cer 
+            valid_cer += cer
             break
     print("Validation CER:", valid_cer / len(eval_dataloader))
 

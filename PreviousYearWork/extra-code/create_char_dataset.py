@@ -1,13 +1,15 @@
-import os
-import cv2
-import matplotlib.pyplot as plt
-import utility as utils
 import json
+import os
+
+import cv2
+
+import utility as utils
 
 
 def make_dirs(characters, path):
     for char in characters:
         os.mkdir(os.path.join(path, char))
+
 
 def vertical_sort(boxes):
     num_boxes = len(boxes)
@@ -21,12 +23,13 @@ def vertical_sort(boxes):
         box2_height = ymax2 - ymin2
 
         # 0.25 to account for the possibility of vertical overlap
-        if (ymin1 >= (ymax2 - 0.25*box2_height)):
+        if (ymin1 >= (ymax2 - 0.25 * box2_height)):
             # print("ran")
             if xmax1 >= xmin2 and xmax1 <= xmax2:
                 temp = boxes[i]
                 boxes[i] = boxes[i + 1]
                 boxes[i + 1] = temp
+
 
 characters = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ"
 # make_dirs(characters, r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR-CLASSIFY\characters")
@@ -54,16 +57,16 @@ iteration = 0
 for filename, label in label_dict.items():
     if iteration % 1000 == 0:
         print(iteration)
-    
+
     iteration += 1
 
     image_file = filename + ".png"
     txt_file = filename + ".txt"
     # train_path = os.path.join(train_images_folder, image_file)
     val_path = os.path.join(val_images_folder, image_file)
-    he_path = os.path.join(val_images_folder, "HE-"+image_file)
-    inv_path = os.path.join(val_images_folder, "INV-"+image_file)
-    he_inv_path = os.path.join(val_images_folder, "INV-HE-"+image_file)
+    he_path = os.path.join(val_images_folder, "HE-" + image_file)
+    inv_path = os.path.join(val_images_folder, "INV-" + image_file)
+    he_inv_path = os.path.join(val_images_folder, "INV-HE-" + image_file)
 
     if os.path.exists(val_path):
         annotations = []
@@ -91,6 +94,6 @@ for filename, label in label_dict.items():
                 cv2.imwrite(os.path.join(root_save_dir, char, f"{char}-VAL-{character_dict[char]}.png"), crop)
                 cv2.imwrite(os.path.join(root_save_dir, char, f"{char}-VAL-HE-{character_dict[char]}.png"), crop_he)
                 cv2.imwrite(os.path.join(root_save_dir, char, f"{char}-VAL-INV-{character_dict[char]}.png"), crop_inv)
-                cv2.imwrite(os.path.join(root_save_dir, char, f"{char}-VAL-INV-HE-{character_dict[char]}.png"), crop_inv_he)
+                cv2.imwrite(os.path.join(root_save_dir, char, f"{char}-VAL-INV-HE-{character_dict[char]}.png"),
+                            crop_inv_he)
                 character_dict[char] += 1
-        

@@ -1,6 +1,6 @@
+import glob
 import os
 import shutil
-import glob
 
 """
     Separate Images into batches
@@ -17,20 +17,19 @@ dir_names = []
 batches = []
 
 for x in range(0, num_images, batch_size):
-    images = image_files[x:x+batch_size]
+    images = image_files[x:x + batch_size]
 
-    if (x+batch_size) > num_images:
+    if (x + batch_size) > num_images:
         foldername = f"{directory}/new-batch{x}-{x + (num_images - x)}"
         batches.append(image_files[x:(x + (num_images - x))])
     else:
-        foldername = f"{directory}/new-batch{x}-{x+batch_size}"
-        batches.append(image_files[x:x+batch_size])
+        foldername = f"{directory}/new-batch{x}-{x + batch_size}"
+        batches.append(image_files[x:x + batch_size])
 
     dir_names.append(foldername)
 
     if not os.path.exists(foldername):
         os.mkdir(foldername)
-
 
 for batch, folder in zip(batches, dir_names):
     for file in batch:

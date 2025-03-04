@@ -1,10 +1,8 @@
-import os
-import glob
 import json
-import cv2
+import os
+
 import albumentations as A
-import matplotlib.pyplot as plt
-import sys
+import cv2
 
 
 def find_char_dist():
@@ -17,6 +15,7 @@ def find_char_dist():
     with open("train-char-dist.json", "w") as file:
         json.dump(char_dist, file)
 
+
 def get_size(root_folder):
     size = 0
     for ele in os.scandir(root_folder):
@@ -26,7 +25,7 @@ def get_size(root_folder):
 
 transforms = A.Compose([
     A.ColorJitter(p=0.5),
-    A.Affine(shear=(0.3,0.4), p=0.5),
+    A.Affine(shear=(0.3, 0.4), p=0.5),
     A.RandomScale((0.7, 0.9)),
     A.Rotate(limit=(-15, 15), p=0.3),
     A.Sharpen(p=0.5),
@@ -63,16 +62,14 @@ for key in characters:
         for image in images:
             if start > maximum:
                 break
-                
+
             if start % 1000 == 0:
                 print(start)
 
             name = image[0]
             img = cv2.imread(os.path.join(root_folder, key, image))
             augmented = transforms(image=img)["image"]
-            save_name = name + "-aug-"+str(start)+".png"
+            save_name = name + "-aug-" + str(start) + ".png"
             save_path = os.path.join(root_folder, key, save_name)
             cv2.imwrite(save_path, augmented)
             start += 1
-
-

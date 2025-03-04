@@ -10,12 +10,12 @@ def parse_csv(file_handle):
 
     return (headers, data, num_records)
 
+
 train_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\reg-train\images"
 val_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\reg-val\images"
 save_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\trocr-train"
 train_images = os.listdir(train_folder)
 val_images = os.listdir(val_folder)
-
 
 label_dict = {}
 with open("CORRECT-LABELS.csv", "r") as file:
@@ -23,7 +23,7 @@ with open("CORRECT-LABELS.csv", "r") as file:
     for line in data:
         label, image = line.split(",")
         label_dict[image] = label
-    
+
 keys = label_dict.keys()
 
 with open("train-set.csv", "w") as file:
@@ -35,5 +35,3 @@ with open("train-set.csv", "w") as file:
                 continue
             file.write(f"{label_dict[name]},{name}\n")
             shutil.copy2(os.path.join(folder, image), os.path.join(save_folder, image))
-    
-

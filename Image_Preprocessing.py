@@ -1,6 +1,7 @@
+from pathlib import Path
+
 import cv2
 import numpy as np
-from pathlib import Path
 
 
 def process_image(image_path, output_folder):
@@ -14,6 +15,7 @@ def process_image(image_path, output_folder):
     # Save processed image
     output_path = output_folder / image_path.name
     cv2.imwrite(str(output_path), output_image)
+
 
 def process_folder(input_folder, output_folder):
     # Convert paths to Path objects
@@ -36,10 +38,11 @@ def process_folder(input_folder, output_folder):
             except Exception as e:
                 print(f"Error processing {file_path.name}: {str(e)}")
 
+
 def process(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Apply CLAHE (Contrast Limited Adaptive Histogram Equalization)
-    clahe = cv2.createCLAHE(clipLimit=10.0, tileGridSize=(1,5))
+    clahe = cv2.createCLAHE(clipLimit=10.0, tileGridSize=(1, 5))
     clahe_output = clahe.apply(gray)
     # blur
     psf = np.ones((5, 5)) / 25
@@ -54,6 +57,7 @@ def process(image):
     # 090009_1701092969862R05_651.jpg
 
     return deblurred
+
 
 if __name__ == "__main__":
     # Specify folder paths

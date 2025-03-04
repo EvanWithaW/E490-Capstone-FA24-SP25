@@ -1,8 +1,8 @@
 import os
-import cv2
 import sys
-import scripts.utility as utils
 
+import cv2
+import scripts.utility as utils
 
 if len(sys.argv) < 4:
     print("Error. Parameters: images_folder annotation_path, save_folder")
@@ -19,7 +19,7 @@ for annotation in annotations:
     image_path = os.path.join(image_folder, image_name)
     save_path = os.path.join(save_folder, save_image)
 
-    if not points: continue 
+    if not points: continue
 
     image = cv2.imread(image_path)
     deskewed = utils.deskew(image, points)

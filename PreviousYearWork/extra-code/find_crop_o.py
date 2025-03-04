@@ -1,4 +1,4 @@
-import os 
+import os
 import shutil
 
 
@@ -7,8 +7,9 @@ def create_label_dict(file_lines):
     data = file_lines[1:]
     label_dict = {}
     for line in data:
-        UFM_ID,TXN_TIME,TOLLZONE_ID,LANE_POSITION,PLATE_TYPE,PLATE_TYPE_CONFIDENCE,PLATE_READ,PLATE_RDR_CONFIDENCE, \
-        PLATE_JURISDICTION,IR_DISPOSITIONED,PAYMENT_METHOD,IMAGE1,IMAGE2,IMAGE3,IMAGE4,TYPE1,TYPE2,TYPE3,TYPE4 = line.split(",")[:-1]
+        UFM_ID, TXN_TIME, TOLLZONE_ID, LANE_POSITION, PLATE_TYPE, PLATE_TYPE_CONFIDENCE, PLATE_READ, PLATE_RDR_CONFIDENCE, \
+            PLATE_JURISDICTION, IR_DISPOSITIONED, PAYMENT_METHOD, IMAGE1, IMAGE2, IMAGE3, IMAGE4, TYPE1, TYPE2, TYPE3, TYPE4 = line.split(
+            ",")[:-1]
         for image in [IMAGE1, IMAGE2, IMAGE3, IMAGE4]:
             if image != "None":
                 label_dict[image.split(".")[0]] = PLATE_READ

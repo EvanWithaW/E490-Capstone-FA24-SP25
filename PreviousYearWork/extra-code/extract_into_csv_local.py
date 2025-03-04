@@ -1,5 +1,6 @@
-import pandas as pd
 import csv
+
+import pandas as pd
 
 
 # https://pandas.pydata.org/docs/reference/api/pandas.read_excel.html
@@ -18,7 +19,7 @@ def create_csv_from_excel(excel_file, save_filename):
     frames = [dataframe0, dataframe1]
     write_df = pd.concat(frames)
 
-    write_df.to_csv(save_filename,  header=True) 
+    write_df.to_csv(save_filename, header=True)
 
 
 excel_file = "ALPRPlateExportDaytime.xlsx"
@@ -27,14 +28,16 @@ parsed_data = "sheets/parsed_data.csv"
 
 # create_csv_from_excel(excel_file, data_location)
 
-data_df = pd.read_csv("sheets/data.csv", usecols=["IMAGE1", "IMAGE2", "PLATE_READ", "PLATE_TYPE_CONFIDENCE", "PLATE_RDR_CONFIDENCE", "PLATE_TYPE"])
+data_df = pd.read_csv("sheets/data.csv",
+                      usecols=["IMAGE1", "IMAGE2", "PLATE_READ", "PLATE_TYPE_CONFIDENCE", "PLATE_RDR_CONFIDENCE",
+                               "PLATE_TYPE"])
 
 fields = ["PLATE_NUM", "IMAGE1", "IMAGE2", "PLATE_TYPE", "PLATE_TYPE_CONFIDENCE", "PLATE_RDR_CONFIDENCE"]
 
 with open(parsed_data, "w", newline="", encoding="utf-8") as csvfile:
     csvwriter = csv.writer(csvfile)
     csvwriter.writerow(fields)
-    
+
     for i in range(len(data_df)):
         image_1 = data_df.loc[i]["IMAGE1"].split("/")[-1] if type(data_df.loc[i]["IMAGE1"]) != float else 0
         image_2 = data_df.loc[i]["IMAGE2"].split("/")[-1] if type(data_df.loc[i]["IMAGE2"]) != float else 0

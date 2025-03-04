@@ -1,7 +1,7 @@
-import cv2
-import numpy as np
-from torch.utils.data import Dataset
 import os
+
+import cv2
+from torch.utils.data import Dataset
 
 
 class CharacterDataset(Dataset):
@@ -9,7 +9,7 @@ class CharacterDataset(Dataset):
         self.images_filepaths = images_filepaths
         self.transforms = transforms
         # self.labels = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        self.labels = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ"     # no O
+        self.labels = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ"  # no O
 
     def __len__(self):
         return len(self.images_filepaths)
@@ -21,7 +21,7 @@ class CharacterDataset(Dataset):
         image = cv2.cvtColor(cv2.imread(image_filepath), cv2.COLOR_BGR2RGB)
         if self.transforms is not None:
             image = self.transforms(image=image)["image"]
-        
+
         # The first character of the filename is the class
         label = self.labels.index(name[0])
 

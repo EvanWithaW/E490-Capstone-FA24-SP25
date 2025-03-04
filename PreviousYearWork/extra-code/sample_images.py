@@ -1,13 +1,12 @@
 import os
 import shutil
+
 from sklearn.utils.random import sample_without_replacement
-
-
 
 images_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\he-invhe-val\images"
 labels_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\he-invhe-val\labels"
 save_image_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\he-invhe-val\images-500"
-save_label_folder =r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\he-invhe-val\labels-500"
+save_label_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\he-invhe-val\labels-500"
 images = os.listdir(images_folder)
 # he = [image for image in images if "HE" in image and "INV" not in image]
 inv_he = [image for image in images if "HE" in image and "INV" in image]

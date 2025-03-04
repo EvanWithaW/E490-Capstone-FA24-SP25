@@ -10,6 +10,7 @@ def parse_csv(file_handle):
 
     return (headers, data, num_records)
 
+
 move_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\train\not-in"
 train_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\train\images"
 labels_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\train\labels"
@@ -39,7 +40,7 @@ for image in train_images:
     if name not in keys and not name.isdigit():
         not_in += 1
         shutil.move(os.path.join(test_folder, image), os.path.join(move_folder, image))
-        shutil.move(os.path.join(test_labels, name+".txt"), os.path.join(move_folder, name+".txt"))
+        shutil.move(os.path.join(test_labels, name + ".txt"), os.path.join(move_folder, name + ".txt"))
 
 print(not_in)
 

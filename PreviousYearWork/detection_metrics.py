@@ -1,8 +1,10 @@
-import torch
 import os
+
 import cv2
-import scripts.utility as utils
+import torch
 from torchvision import ops
+
+import scripts.utility as utils
 
 
 def get_iou(prediction_box, ground_truth_box):
@@ -15,6 +17,7 @@ def get_iou(prediction_box, ground_truth_box):
     iou = ops.box_iou(truth_box_tensor, prediction_box_tensor)
 
     return iou.numpy()[0][0].item()
+
 
 def character_detect_metrics(pred_folder, label_folder, images_folder):
     labels = os.listdir(label_folder)
@@ -40,14 +43,15 @@ def character_detect_metrics(pred_folder, label_folder, images_folder):
     for label in labels:
         name, ext = os.path.splitext(label)
         image = cv2.imread(os.path.join(images_folder, name + ".png"))
-        with open(os.path.join(label_folder, label), "r") as label_file, open(os.path.join(pred_folder, label), "r") as pred_file:
+        with open(os.path.join(label_folder, label), "r") as label_file, open(os.path.join(pred_folder, label),
+                                                                              "r") as pred_file:
             label_lines = [l.strip() for l in label_file.readlines()]
-            pred_lines = [l.strip() for l in pred_file.readlines()] 
+            pred_lines = [l.strip() for l in pred_file.readlines()]
             total_chars += len(label_lines)
 
             label_len = len(label_lines)
             pred_len = len(pred_lines)
-            
+
             if label_len == pred_len:
                 eq_chars += 1
                 label_boxs = [utils.annotation_to_points(image, l) for l in label_lines]
@@ -64,7 +68,7 @@ def character_detect_metrics(pred_folder, label_folder, images_folder):
                     FN += label_len - pred_len
                 elif label_len < pred_len:
                     FP += pred_len - label_len
-    
+
     return correct_chars, total_chars, eq_chars, diff_chars, TP, FP, TN, FN
 
 
@@ -73,7 +77,6 @@ def lp_detect_metrics(pred_folder, label_folder, images_folder):
     predictions = os.listdir(pred_folder)
     images = os.listdir(images_folder)
 
-    
     print(len(images))
     print(len(labels))
     print(len(predictions))
@@ -94,10 +97,11 @@ def lp_detect_metrics(pred_folder, label_folder, images_folder):
             print(f"{i}/{len(labels)}")
         name, ext = os.path.splitext(label)
         image = cv2.imread(os.path.join(images_folder, name + ".jpg"))
-        with open(os.path.join(label_folder, label), "r") as label_file, open(os.path.join(pred_folder, label)) as pred_file:
+        with open(os.path.join(label_folder, label), "r") as label_file, open(
+                os.path.join(pred_folder, label)) as pred_file:
             label_lines = label_file.readlines()
             pred_lines = pred_file.readlines()
-            
+
             if len(pred_lines) > 1:
                 multiple_plates += 1
                 continue
@@ -109,7 +113,7 @@ def lp_detect_metrics(pred_folder, label_folder, images_folder):
                 label_box = utils.annotation_to_points(image, label_line)
                 pred_box = utils.annotation_to_points(image, pred_line)
                 iou = get_iou(pred_box, label_box)
-                
+
                 if iou > threshold:
                     TP += 1
                 else:

@@ -4,22 +4,23 @@
 # Inference using custom trained model: https://github.com/ultralytics/yolov5/issues/7044
 
 
-import torch
+import csv
 import glob
 import os
-import cv2
-import numpy as np
-import pandas as pd
-import csv
 import time
+
+import cv2
 import easyocr
-from easyocr_test import easyocr_test
+import pandas as pd
+import torch
 from crop_LP import crop_from_points
+from easyocr_test import easyocr_test
 
 # fix on silo... issues with pillow library
 # https://forums.fast.ai/t/oserror-image-file-is-truncated-38-bytes-not-processed/30806/5
 if os.name == "posix":
     from PIL import ImageFile
+
     ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 model = torch.hub.load('ultralytics/yolov5', 'custom', 'best5.pt')
@@ -42,7 +43,7 @@ fields = ["Image", "Actual", "Prediciton", "True"]
 # model.load_state_dict(torch.load('yolov5/runs/train/exp4/weights/best.pt')['model'].state_dict())
 
 # set for inference
-model.eval()    
+model.eval()
 
 image_files = glob.glob(os.path.join('/l/research/v2x/images', '*.*'))
 batch1 = image_files[0:250]
@@ -71,7 +72,6 @@ test_batches = [test]
 
 founds = []
 
-
 for batch in test_batches:
     tic = time.time()
     results = model(batch)
@@ -88,7 +88,7 @@ for batch in test_batches:
             bounding_box = pred[:4]
             confidence = pred[4]
             class_number = pred[5]
-            #print(f"Bounding Box Prediciton: {bounding_box}\tConfidence:{confidence:.2f}")
+            # print(f"Bounding Box Prediciton: {bounding_box}\tConfidence:{confidence:.2f}")
 
             image = cv2.imread(im)
             cropped = crop_from_points(image, bounding_box)
@@ -107,13 +107,13 @@ for batch in test_batches:
             # elif not look2.empty: 
             #     found = no_lp_df.loc[no_lp_df["image"] == image]["Actual"]
 
-            if not look1.empty: 
-                found = s0_df.loc[s0_df["IMAGE1"] == image_name]["PLATE_READ"].to_list()[0] 
-            elif not look2.empty: 
+            if not look1.empty:
+                found = s0_df.loc[s0_df["IMAGE1"] == image_name]["PLATE_READ"].to_list()[0]
+            elif not look2.empty:
                 found = s0_df.loc[s0_df["IMAGE2"] == image_name]["PLATE_READ"].to_list()[0]
             elif not look3.empty:
                 found = s1_df.loc[s1_df["IMAGE1"] == image_name]["PLATE_READ"].to_list()[0]
-            elif not look4.empty: 
+            elif not look4.empty:
                 found = s1_df.loc[s1_df["IMAGE2"] == image_name]["PLATE_READ"].to_list()[0]
 
             # easyocr prediction
@@ -127,8 +127,10 @@ for batch in test_batches:
 
             # print(prediction, found)
             # calculate correct and incorrect predictions
-            if found == prediction: true += 1
-            else: false += 1
+            if found == prediction:
+                true += 1
+            else:
+                false += 1
 
             write_data.append([image_name, found, prediction, found == prediction])
         else:
@@ -136,16 +138,15 @@ for batch in test_batches:
             no_plate += 1
             no_LP.append([image_name, found])
 
-
 with open("preds.csv", "w") as csvfile:
-    csvwriter = csv.writer(csvfile)  
+    csvwriter = csv.writer(csvfile)
     csvwriter.writerow(fields)
-    csvwriter.writerows(write_data) 
+    csvwriter.writerows(write_data)
 
 with open("no_LP.csv", "w") as csvfile:
-    csvwriter = csv.writer(csvfile)  
+    csvwriter = csv.writer(csvfile)
     csvwriter.writerow(["image", "Actual"])
-    csvwriter.writerows(no_LP) 
+    csvwriter.writerows(no_LP)
 
 # os.system("clear")
 print(len(write_data))
@@ -153,7 +154,6 @@ print(len(no_LP))
 print(f"True: {true}\tFalse:{false}\tNo Plates: {no_plate}")
 for pred in founds:
     print(pred)
-#help(results)
+# help(results)
 
 # results.save()
-

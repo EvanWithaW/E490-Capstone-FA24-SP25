@@ -1,13 +1,11 @@
-import os
-import sys
 import glob
-import cv2
-import time
+import os
 import re
+import sys
+import time
+
+import cv2
 import torch
-import json
-import openpyxl
-import scripts.utility as utils
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 
 
@@ -16,8 +14,9 @@ def create_label_dict(file_lines):
     data = file_lines[1:]
     label_dict = {}
     for line in data:
-        UFM_ID,TXN_TIME,TOLLZONE_ID,LANE_POSITION,PLATE_TYPE,PLATE_TYPE_CONFIDENCE,PLATE_READ,PLATE_RDR_CONFIDENCE, \
-        PLATE_JURISDICTION,IR_DISPOSITIONED,PAYMENT_METHOD,IMAGE1,IMAGE2,IMAGE3,IMAGE4,TYPE1,TYPE2,TYPE3,TYPE4 = line.split(",")[:-1]
+        UFM_ID, TXN_TIME, TOLLZONE_ID, LANE_POSITION, PLATE_TYPE, PLATE_TYPE_CONFIDENCE, PLATE_READ, PLATE_RDR_CONFIDENCE, \
+            PLATE_JURISDICTION, IR_DISPOSITIONED, PAYMENT_METHOD, IMAGE1, IMAGE2, IMAGE3, IMAGE4, TYPE1, TYPE2, TYPE3, TYPE4 = line.split(
+            ",")[:-1]
         for image in [IMAGE1, IMAGE2, IMAGE3, IMAGE4]:
             if image != "None":
                 label_dict[image.split(".")[0]] = PLATE_READ
@@ -69,7 +68,7 @@ iterations = 0
 plate_number = ""
 
 for img in images:
-    image = cv2.imread(img) 
+    image = cv2.imread(img)
     pixel_values = processor(images=image, return_tensors="pt").pixel_values
     pixel_values = pixel_values.to(device)
 
@@ -78,10 +77,10 @@ for img in images:
 
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
     parsed_ocr_value = re.sub('[\W_]+', '', generated_text)
-    
+
     # for single chars
     plate_number += parsed_ocr_value
-    
+
     # [:-4] slice is to remove the file extension
     # image_name = img.split("\\")[-1][:-4]
     # label = label_dict[image_name]
@@ -107,7 +106,6 @@ last_toc = time.time()
 # average_time = total_time / n_images
 # print(f"Total Time: {total_time / 60} minutes\tAverage Time: {average_time} seconds for {n_images} images.")
 print(plate_number)
-
 
 # workbook.save(filename=save_path)
 # with open(save_path, "w") as file:

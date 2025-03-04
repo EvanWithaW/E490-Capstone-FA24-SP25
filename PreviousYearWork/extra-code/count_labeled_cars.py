@@ -1,7 +1,7 @@
-import os
 import json
-import scripts.utility as utils
+import os
 
+import scripts.utility as utils
 
 annotation_folder = r"C:\Users\Jed\Desktop\v2x-dataset\cars_kp_annotations"
 annotation_files = os.listdir(os.path.join(annotation_folder))
@@ -18,7 +18,6 @@ for annotation_file in annotation_files:
 with open(data_path, "r") as file:
     data_dict = json.load(file)
     keys = list(data_dict.keys())
-
 
     for annotation in annotations:
         image_name, labeled_plate, points = annotation

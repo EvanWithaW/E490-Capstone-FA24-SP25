@@ -1,8 +1,9 @@
-from sklearn.model_selection import train_test_split
-import numpy as np
-import os
 import glob
+import os
 import shutil
+
+import numpy as np
+from sklearn.model_selection import train_test_split
 
 
 def parse_csv(file_handle):
@@ -12,6 +13,7 @@ def parse_csv(file_handle):
     num_records = len(data)
 
     return (headers, data, num_records)
+
 
 def create_label_file():
     whole_list = []
@@ -33,6 +35,7 @@ def create_label_file():
             label, image = entry
             file.write(f"{label},{image}\n")
 
+
 def create_X_y_labels(file_path):
     with open(file_path, "r") as file:
         headers, data, num_records = parse_csv(file)
@@ -40,13 +43,13 @@ def create_X_y_labels(file_path):
         y = []
         for line in data:
             split_line = line.strip().split(",")
-            label, image = split_line   
+            label, image = split_line
             X.append(image)
             y.append(label)
 
         np_X = np.array(X)
         np_y = np.array(y)
-        
+
         return np_X, np_y
 
 
@@ -64,6 +67,7 @@ def copy_files(from_folder, to_folder):
     from_files = os.listdir(from_folder)
     for file in from_files:
         shutil.copy2(os.path.join(from_folder, file), os.path.join(to_folder, file))
+
 
 # path = "CORRECT-LABELS.csv"
 # X, y = create_X_y_labels(path)
@@ -94,7 +98,6 @@ for image in X_val:
 for image in X_test:
     shutil.copy2(os.path.join(images_folder, image), os.path.join(test_images_folder, image))
 
-
 # labels
 train_images = os.listdir(train_images_folder)
 val_images = os.listdir(val_images_folder)
@@ -109,6 +112,7 @@ def copy_txt_files(image_files, from_folder, to_folder):
         txt_path = os.path.join(from_folder, txt_file)
         if os.path.exists(txt_path):
             shutil.copy2(txt_path, os.path.join(to_folder, txt_file))
+
 
 copy_txt_files(train_images, labels_folder, train_labels_folder)
 copy_txt_files(val_images, labels_folder, val_labels_folder)
@@ -125,7 +129,4 @@ copy_txt_files(test_images, labels_folder, test_labels_folder)
 # print(num)
 
 
-
-
 # /N/slate/jdmckean
-

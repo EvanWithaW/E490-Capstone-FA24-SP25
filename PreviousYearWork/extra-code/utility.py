@@ -1,5 +1,6 @@
-import math
 import json
+import math
+
 import cv2
 import numpy as np
 from openpyxl import Workbook
@@ -9,19 +10,18 @@ from openpyxl import Workbook
 # TODO Add vertical character sorting to get_bounding_box_data
 
 def annotation_to_points(image, annotation_info):
-    
     klass, x_center, y_center, box_width, box_height = annotation_info.split(' ')
     image_height, image_width, channels = image.shape
- 
+
     x_center = float(x_center) * image_width
     y_center = float(y_center) * image_height
     box_width = float(box_width) * image_width
     box_height = float(box_height) * image_height
 
-    xmin = math.floor(x_center - (box_width/2))
-    ymin = math.floor(y_center - (box_height/2))
-    xmax = math.ceil(x_center + (box_width/2))
-    ymax = math.ceil(y_center + (box_height/2))
+    xmin = math.floor(x_center - (box_width / 2))
+    ymin = math.floor(y_center - (box_height / 2))
+    xmax = math.ceil(x_center + (box_width / 2))
+    ymax = math.ceil(y_center + (box_height / 2))
 
     return [xmin, ymin, xmax, ymax]
 
@@ -30,8 +30,8 @@ def box_to_annotation(box, image_width, image_height, class_number):
     xmin, ymin, xmax, ymax = box
     box_width = xmax - xmin
     box_height = ymax - ymin
-    x_center = xmin + (box_width/2)
-    y_center = ymin + (box_height/2)
+    x_center = xmin + (box_width / 2)
+    y_center = ymin + (box_height / 2)
 
     # normalize values
     box_width = box_width / image_width
@@ -41,7 +41,7 @@ def box_to_annotation(box, image_width, image_height, class_number):
 
     return f"{class_number} {x_center:.6f} {y_center:.6f} {box_width:.6f} {box_height:.6f}"
 
-    
+
 def crop_from_yolo_annotation(image, annotation_info):
     """
         Uses data from a yolo format annotation file to return a cropped section of the input image.
@@ -68,7 +68,7 @@ def crop_from_points(image, bbox_points, padding=0):
 
         return: a cropped image -> array like
     """
-    
+
     xmin, ymin, xmax, ymax = bbox_points
     width, height, channels = image.shape
     xmin = max(0, math.floor(xmin) - padding)
@@ -77,6 +77,7 @@ def crop_from_points(image, bbox_points, padding=0):
     ymax = min(width, math.ceil(ymax) + padding)
 
     return image[int(ymin):int(ymax), int(xmin):int(xmax)]
+
 
 def vertical_sort(boxes):
     num_boxes = len(boxes)
@@ -90,12 +91,13 @@ def vertical_sort(boxes):
         box2_height = ymax2 - ymin2
 
         # 0.25 to account for the possibility of vertical overlap
-        if (ymin1 >= (ymax2 - 0.25*box2_height)):
+        if (ymin1 >= (ymax2 - 0.25 * box2_height)):
             # print("ran")
             if xmax1 >= xmin2 and xmax1 <= xmax2:
                 temp = boxes[i]
                 boxes[i] = boxes[i + 1]
                 boxes[i + 1] = temp
+
 
 def get_highest_conf(boxes):
     highest_conf = ""
@@ -105,6 +107,7 @@ def get_highest_conf(boxes):
             highest_conf = boxes[i + 1]
 
         return [highest_conf]
+
 
 def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
     """
@@ -119,7 +122,7 @@ def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
                 [[xmin, ymin, xmax, ymax], confidence, class_number], ...]
                 len(boxes) >= 1
     """
-    
+
     boxes = []
 
     # for each bounding box predicted in the image
@@ -127,10 +130,10 @@ def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
         # box: [xmin, ymin, xmax, ymax, confidence, class number]
         bounding_box = box[:4]
         confidence = box[4]
-        class_number = box[5]       # only two for now: license plate or character
+        class_number = box[5]  # only two for now: license plate or character
 
         width, height, channels = image.shape
-        
+
         xmin = max(0, math.floor(bounding_box[0]) - padding)
         ymin = max(0, math.floor(bounding_box[1]) - padding)
         xmax = min(height, math.ceil(bounding_box[2]) + padding)
@@ -139,7 +142,7 @@ def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
         bounding_box = [[xmin, ymin, xmax, ymax], confidence, class_number]
         boxes.append(bounding_box)
 
-    # sort horizontally and vertically
+        # sort horizontally and vertically
         if len(boxes) > 1:
             if model == "lp":
                 boxes = get_highest_conf(boxes)
@@ -153,7 +156,7 @@ def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
 def extract_from_datumaro(json_file, finished_items=None):
     f = open(json_file)
     json_dict = json.load(f)
-    
+
     data = []
     items = json_dict["items"]
 
@@ -166,7 +169,7 @@ def extract_from_datumaro(json_file, finished_items=None):
         annotations = item["annotations"]
         plate_number = ""
         points = []
-        
+
         # check for labeled images
         if annotations:
             attributes = annotations[0]["attributes"]
@@ -178,14 +181,14 @@ def extract_from_datumaro(json_file, finished_items=None):
                 plate_number = attributes["Plate Number"]
 
             pts = annotations[0]["points"]
-            
+
             for i in range(0, 8, 2):
                 points.append([pts[i], pts[i + 1]])
 
             ### sort points: [top left, top right, bottom left, bottom right]
             # sort by y coordinate
             points.sort(key=lambda point: point[1])
-            
+
             # sort each half by x corrdinate
             top = points[:2]
             top.sort(key=lambda point: point[0])
@@ -193,10 +196,9 @@ def extract_from_datumaro(json_file, finished_items=None):
             bottom.sort(key=lambda point: point[0])
 
             points = top + bottom
-            
 
         data.append([image_file, plate_number, points])
-    
+
     return data
 
 
@@ -207,25 +209,25 @@ def get_min_max(keypoints):
     ymin = min(top_left[1], top_right[1])
     ymax = max(bottom_left[1], bottom_right[1])
 
-    return [xmin, xmax, ymin, ymax]  
+    return [xmin, xmax, ymin, ymax]
 
 
 def get_transform_points(keypoints, padding=None):
     xmin, xmax, ymin, ymax = get_min_max(keypoints)
     box_width = xmax - xmin
     box_height = ymax - ymin
-    
+
     # point order: top left, bottom left, bottom right, top right 
     dest_points = np.float32([[0, 0],
-                              [0, box_height-1],
-                              [box_width-1, box_height-1],
-                              [box_width-1, 0]])
+                              [0, box_height - 1],
+                              [box_width - 1, box_height - 1],
+                              [box_width - 1, 0]])
 
     return [dest_points, box_width, box_height]
 
 
 def deskew(image, points):
-    top_left, top_right, bottom_left, bottom_right = points 
+    top_left, top_right, bottom_left, bottom_right = points
     input_points = np.float32([top_left, bottom_left, bottom_right, top_right])
     dest_points, width, height = get_transform_points(points)
 
@@ -244,7 +246,7 @@ def visualize_annotations(image_path, box=None, keypoints=None, box_color=(0, 25
 
     cv2.namedWindow("Annotation", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Annotation", 600, 600)
-    
+
     if keypoints:
         xmin, xmax, ymin, ymax = get_min_max(keypoints)
         annotated = cv2.rectangle(image, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (0, 255, 0), 3)
@@ -252,7 +254,6 @@ def visualize_annotations(image_path, box=None, keypoints=None, box_color=(0, 25
         for point in keypoints:
             x, y = point
             annotated = cv2.circle(image, (int(x), int(y)), radius=10, color=point_color, thickness=-1)
-
 
     cv2.imshow("Annotation", annotated)
     # cv2.waitKey(0)

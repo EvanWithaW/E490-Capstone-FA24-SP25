@@ -1,8 +1,9 @@
-import math
 import json
+import math
+import re
+
 import cv2
 import numpy as np
-import re
 import torch
 
 
@@ -10,19 +11,18 @@ import torch
 # Bounding Box and annotations handling functions
 ##############################################
 def annotation_to_points(image, annotation_info):
-    
     klass, x_center, y_center, box_width, box_height = annotation_info.split(' ')
     image_height, image_width, channels = image.shape
- 
+
     x_center = float(x_center) * image_width
     y_center = float(y_center) * image_height
     box_width = float(box_width) * image_width
     box_height = float(box_height) * image_height
 
-    xmin = math.floor(x_center - (box_width/2))
-    ymin = math.floor(y_center - (box_height/2))
-    xmax = math.ceil(x_center + (box_width/2))
-    ymax = math.ceil(y_center + (box_height/2))
+    xmin = math.floor(x_center - (box_width / 2))
+    ymin = math.floor(y_center - (box_height / 2))
+    xmax = math.ceil(x_center + (box_width / 2))
+    ymax = math.ceil(y_center + (box_height / 2))
 
     return [xmin, ymin, xmax, ymax]
 
@@ -31,8 +31,8 @@ def box_to_annotation(box, image_width, image_height, class_number):
     xmin, ymin, xmax, ymax = box
     box_width = xmax - xmin
     box_height = ymax - ymin
-    x_center = xmin + (box_width/2)
-    y_center = ymin + (box_height/2)
+    x_center = xmin + (box_width / 2)
+    y_center = ymin + (box_height / 2)
 
     # normalize values
     box_width = box_width / image_width
@@ -42,7 +42,7 @@ def box_to_annotation(box, image_width, image_height, class_number):
 
     return f"{class_number} {x_center:.6f} {y_center:.6f} {box_width:.6f} {box_height:.6f}"
 
-    
+
 def crop_from_yolo_annotation(image, annotation_info):
     """
         Uses data from a yolo format annotation file to return a cropped section of the input image.
@@ -69,10 +69,11 @@ def crop_from_points(image, bbox_points):
 
         return: a cropped image -> array like
     """
-    
+
     xmin, ymin, xmax, ymax = bbox_points
 
     return image[int(ymin):int(ymax), int(xmin):int(xmax)]
+
 
 def vertical_sort(boxes):
     """
@@ -92,12 +93,13 @@ def vertical_sort(boxes):
 
         # check that the box is above the next box
         # 0.25 to account for the possibility of vertical overlap between boxes
-        if (ymin1 >= (ymax2 - 0.25*box2_height)):
+        if (ymin1 >= (ymax2 - 0.25 * box2_height)):
             # check if the first box needs to be moved
             if xmax1 >= xmin2 and xmax1 <= xmax2:
                 temp = boxes[i]
                 boxes[i] = boxes[i + 1]
                 boxes[i + 1] = temp
+
 
 def get_highest_conf(boxes):
     highest_conf = ""
@@ -107,6 +109,7 @@ def get_highest_conf(boxes):
             highest_conf = boxes[i + 1]
 
         return [highest_conf]
+
 
 def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
     """
@@ -125,7 +128,7 @@ def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
                 [[bounding_box, confidence, class_number], ...]
                 [[xmin, ymin, xmax, ymax], confidence, class_number], ...]
     """
-    
+
     boxes = []
 
     # for each bounding box predicted in the image
@@ -133,10 +136,10 @@ def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
         # box: [xmin, ymin, xmax, ymax, confidence, class number]
         bounding_box = box[:4]
         confidence = box[4]
-        class_number = box[5]       # only two for now: license plate or character
+        class_number = box[5]  # only two for now: license plate or character
 
         width, height, channels = image.shape
-        
+
         xmin = max(0, math.floor(bounding_box[0]) - padding)
         ymin = max(0, math.floor(bounding_box[1]) - padding)
         xmax = min(height, math.ceil(bounding_box[2]) + padding)
@@ -145,7 +148,6 @@ def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
         bounding_box = [[xmin, ymin, xmax, ymax], confidence, class_number]
         boxes.append(bounding_box)
 
-    
         if len(boxes) > 1:
             # take the box with the highest confidence
             if model == "lp":
@@ -157,6 +159,7 @@ def get_bounding_box_data(model_prediction, image, padding=0, model="lp"):
 
     return boxes
 
+
 ##############################################
 # Image Processing functions
 ##############################################
@@ -166,7 +169,7 @@ def HE(img):
 
         Returns a histogram equalized image
     """
-    
+
     # Convert the image to LAB color space
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 
@@ -184,6 +187,7 @@ def HE(img):
 
     return equalized_img
 
+
 ##############################################
 # Model output handling and prediction functions
 ##############################################
@@ -194,10 +198,10 @@ def get_crop_lp(model_output, image):
     """
     crop = np.array([])
     for prediction in model_output.xyxy:
-        if prediction.numel() == 0:    
+        if prediction.numel() == 0:
             continue
 
-        prediction = prediction.tolist()     
+        prediction = prediction.tolist()
         boxes = get_bounding_box_data(prediction, image, padding=0, model="lp")
 
         for box in boxes:
@@ -205,6 +209,7 @@ def get_crop_lp(model_output, image):
             crop = crop_from_points(image, bbox)
 
     return crop
+
 
 def get_crops_chars(model_output, image):
     """
@@ -214,18 +219,18 @@ def get_crops_chars(model_output, image):
     # we can use model_output.conf to get the confidence of the predicted bounding box coordinates
     char_list = []
     for prediction in model_output.xyxy:
-        if prediction.numel() == 0:    
+        if prediction.numel() == 0:
             continue
 
-        prediction = prediction.tolist()    
-        
+        prediction = prediction.tolist()
+
         boxes = get_bounding_box_data(prediction, image, padding=1, model="char")
         for box in boxes:
             bbox, conf, klass = box
             crop = crop_from_points(image, bbox)
             char_list.append(crop)
 
-    return char_list 
+    return char_list
 
 
 def predict_chars(character_crops, classifier, transforms, device):
@@ -235,7 +240,7 @@ def predict_chars(character_crops, classifier, transforms, device):
         transforms: albumations image transforms for letterboxing and image normalization
         device: torch device to send the image to for model processing: cuda(gpu) or cpu
     """
-    labels = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ" 
+    labels = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ"
     pred_str = ""
     with torch.no_grad():
         for char_image in character_crops:
@@ -246,6 +251,7 @@ def predict_chars(character_crops, classifier, transforms, device):
             pred_str += labels[real]
 
     return pred_str
+
 
 def pred_lp_trocr(lp_crop, trocr_model, processor, device):
     """
@@ -269,6 +275,7 @@ def pred_lp_trocr(lp_crop, trocr_model, processor, device):
 
     return parsed_ocr_value
 
+
 ##############################################
 # Keypoint plate detector helper functions
 ##############################################
@@ -279,25 +286,25 @@ def get_min_max(keypoints):
     ymin = min(top_left[1], top_right[1])
     ymax = max(bottom_left[1], bottom_right[1])
 
-    return [xmin, xmax, ymin, ymax]  
+    return [xmin, xmax, ymin, ymax]
 
 
 def get_transform_points(keypoints, padding=None):
     xmin, xmax, ymin, ymax = get_min_max(keypoints)
     box_width = xmax - xmin
     box_height = ymax - ymin
-    
+
     # point order: top left, bottom left, bottom right, top right 
     dest_points = np.float32([[0, 0],
-                              [0, box_height-1],
-                              [box_width-1, box_height-1],
-                              [box_width-1, 0]])
+                              [0, box_height - 1],
+                              [box_width - 1, box_height - 1],
+                              [box_width - 1, 0]])
 
     return [dest_points, box_width, box_height]
 
 
 def deskew(image, points):
-    top_left, top_right, bottom_left, bottom_right = points 
+    top_left, top_right, bottom_left, bottom_right = points
     input_points = np.float32([top_left, bottom_left, bottom_right, top_right])
     dest_points, width, height = get_transform_points(points)
 
@@ -314,7 +321,7 @@ def extract_from_datumaro(json_file, finished_items=None):
     """
     f = open(json_file)
     json_dict = json.load(f)
-    
+
     data = []
     items = json_dict["items"]
 
@@ -327,7 +334,7 @@ def extract_from_datumaro(json_file, finished_items=None):
         annotations = item["annotations"]
         plate_number = ""
         points = []
-        
+
         # check for labeled images
         if annotations:
             attributes = annotations[0]["attributes"]
@@ -339,14 +346,14 @@ def extract_from_datumaro(json_file, finished_items=None):
                 plate_number = attributes["Plate Number"]
 
             pts = annotations[0]["points"]
-            
+
             for i in range(0, 8, 2):
                 points.append([pts[i], pts[i + 1]])
 
             ### sort points: [top left, top right, bottom left, bottom right]
             # sort by y coordinate
             points.sort(key=lambda point: point[1])
-            
+
             # sort each half by x corrdinate
             top = points[:2]
             top.sort(key=lambda point: point[0])
@@ -354,10 +361,9 @@ def extract_from_datumaro(json_file, finished_items=None):
             bottom.sort(key=lambda point: point[0])
 
             points = top + bottom
-            
 
         data.append([image_file, plate_number, points])
-    
+
     return data
 
 
@@ -372,6 +378,7 @@ def parse_csv(file_handle):
 
     return (headers, data, num_records)
 
+
 def create_label_dict(file_lines):
     headers = file_lines[0].split(",")
     for header in headers:
@@ -379,8 +386,9 @@ def create_label_dict(file_lines):
     data = file_lines[1:]
     label_dict = {}
     for line in data:
-       # print(line.split(","))
-        UFM_ID,TXN_TIME,TOLLZONE_ID,LANE_POSITION,PLATE_TYPE,PLATE_TYPE_CONFIDENCE,PLATE_READ,PLATE_RDR_CONFIDENCE,IR_DISPOSITIONED,PAYMENT_METHOD,IMAGE1,IMAGE2,IMAGE3,IMAGE4,TYPE1,TYPE2,TYPE3,TYPE4 = line.split(",")
+        # print(line.split(","))
+        UFM_ID, TXN_TIME, TOLLZONE_ID, LANE_POSITION, PLATE_TYPE, PLATE_TYPE_CONFIDENCE, PLATE_READ, PLATE_RDR_CONFIDENCE, IR_DISPOSITIONED, PAYMENT_METHOD, IMAGE1, IMAGE2, IMAGE3, IMAGE4, TYPE1, TYPE2, TYPE3, TYPE4 = line.split(
+            ",")
         for image in [IMAGE1, IMAGE2, IMAGE3, IMAGE4]:
             if image != "" and image != '\n':
                 imagewithoutsuffix = image.split('.')[2].split('/')[6]

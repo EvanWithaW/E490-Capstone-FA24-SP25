@@ -1,7 +1,7 @@
 import os
 import shutil
-from sklearn.utils.random import sample_without_replacement
 
+from sklearn.utils.random import sample_without_replacement
 
 maximum = 30000
 save_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR-CLASSIFY\train"
@@ -35,5 +35,3 @@ for char in characters:
                 break
             shutil.copy2(os.path.join(folder, aug[index]), os.path.join(save_folder, aug[index]))
             num_chars += 1
-
-

@@ -1,16 +1,16 @@
-import os
 import glob
+import os
+
+import albumentations as A
 import cv2
 import torch
-from torch.utils.data import DataLoader
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-import albumentations as A
 from albumentations.pytorch import ToTensorV2
-from CharacterModel import CharacterModel
-from CharacterDataset import CharacterDataset
+from torch.utils.data import DataLoader
 
+from CharacterDataset import CharacterDataset
+from CharacterModel import CharacterModel
 
 images_folder = ""
 image_paths = glob.glob(os.path.join(images_folder, "*"))
@@ -70,8 +70,8 @@ for epoch in range(num_epochs):  # loop over the dataset multiple times
 
         # print statistics
         running_loss += loss.item()
-        if i % 100 == 99:    # print every 100 mini-batches
-            print(f'[{epoch + 1}, {i+1}] loss: {running_loss / 100:.5f}')
+        if i % 100 == 99:  # print every 100 mini-batches
+            print(f'[{epoch + 1}, {i + 1}] loss: {running_loss / 100:.5f}')
             running_loss = 0.0
 
 print('Finished Training')
@@ -79,7 +79,3 @@ print()
 
 PATH = './weights/train-last.pth'
 torch.save(model.state_dict(), PATH)
-
-
-
-

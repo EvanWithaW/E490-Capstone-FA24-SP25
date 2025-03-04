@@ -1,8 +1,9 @@
-import easyocr
-import sys
-import os
-import glob
 import csv
+import glob
+import os
+import sys
+
+import easyocr
 
 
 def easyocr_test(image_path):
@@ -12,7 +13,8 @@ def easyocr_test(image_path):
         if detection[2] > 0.5:
             # print(detection[1])
             return detection[1]
-        
+
+
 def easyocr_test_batch(image_folder):
     prediction_list = []
     reader = easyocr.Reader(['en'], gpu=False)
@@ -22,12 +24,12 @@ def easyocr_test_batch(image_folder):
     with open("easyocr-test-set-cropped.csv", "w", newline="", encoding="utf-8") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
-        
+
         for image in images:
             image_name = image.split("\\")[-1]
-            
+
             allow_list = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            result = reader.readtext(image, allowlist=allow_list, )#rotation_info=[90,180,270])
+            result = reader.readtext(image, allowlist=allow_list, )  # rotation_info=[90,180,270])
             for detection in result:
                 read = detection[1]
                 confidence = detection[2]
@@ -39,4 +41,3 @@ if __name__ == '__main__':
     image_path = sys.argv[1]
     # easyocr_test(image_path)
     easyocr_test_batch(image_path)
-

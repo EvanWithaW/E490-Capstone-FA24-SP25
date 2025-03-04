@@ -1,9 +1,9 @@
-import re
-import os
 import json
+import os
+import re
+
 import openpyxl
 import scripts.utility as utils
-
 
 annotation_folder = r"C:\Users\Jed\Desktop\v2x-dataset\kp-annotations"
 trocr_data_path = os.path.join(r"C:\Users\Jed\Desktop\v2x-dataset", "trocr_results.json")

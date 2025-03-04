@@ -1,7 +1,7 @@
 import os
+
 import cv2
 import scripts.utility as utils
-
 
 annotation_path = r"C:\Users\Jed\Desktop\kp_annotations.json"
 annotations = utils.extract_from_datumaro(annotation_path, 608)
@@ -30,6 +30,3 @@ for annotation in annotations[0:10]:
     cv2.imshow("Perspective Corrected", deskewed)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-
-

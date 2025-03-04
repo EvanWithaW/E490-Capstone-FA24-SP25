@@ -1,5 +1,5 @@
-import os
 import glob
+import os
 import shutil
 
 
@@ -10,6 +10,7 @@ def parse_csv(file_handle):
     num_records = len(data)
 
     return (headers, data, num_records)
+
 
 images_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\train\images"
 move_folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\train\check"
@@ -38,7 +39,7 @@ for path in ann_paths:
 
     if is_not_in:
         shutil.move(path, os.path.join(move_folder, ann_file))
-        shutil.move(os.path.join(images_folder, image+".png"), os.path.join(move_folder, image+".png"))
+        shutil.move(os.path.join(images_folder, image + ".png"), os.path.join(move_folder, image + ".png"))
 
 print(incorrect)
 print(not_in)

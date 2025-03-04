@@ -1,22 +1,23 @@
-import torch
-import os
-import cv2
-import sys
-import glob
 import datetime
-import numpy as np
+import glob
+import os
+import sys
+import time as tm
+
 import albumentations as A
+import cv2
+import torch
 from albumentations.pytorch import ToTensorV2
 # from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 from ultralytics import YOLO
-import LPutility
-import time as tm
 
+import LPutility
 
 # Path issue fix: https://stackoverflow.com/questions/57286486/i-cant-load-my-model-because-i-cant-put-a-posixpath
 temp = ""
 if sys.platform == "win32":
     import pathlib
+
     temp = pathlib.PosixPath
     pathlib.PosixPath = pathlib.WindowsPath
 
@@ -46,22 +47,21 @@ char_model.to(device)
 
 image_size = 32
 transforms = A.Compose([
-        # A.Affine(shear={"x":15}, p=1.0),
-        A.LongestMaxSize(max_size=image_size),
-        A.PadIfNeeded(
-            min_height=image_size,
-            min_width=image_size,
-            border_mode=cv2.BORDER_CONSTANT,
-            value=(0, 0, 0),
-        ),
-        A.Normalize(
-            mean=[0, 0, 0],
-            std=[1, 1, 1],
-            max_pixel_value=255,
-        ),
-        ToTensorV2()
-    ])
-
+    # A.Affine(shear={"x":15}, p=1.0),
+    A.LongestMaxSize(max_size=image_size),
+    A.PadIfNeeded(
+        min_height=image_size,
+        min_width=image_size,
+        border_mode=cv2.BORDER_CONSTANT,
+        value=(0, 0, 0),
+    ),
+    A.Normalize(
+        mean=[0, 0, 0],
+        std=[1, 1, 1],
+        max_pixel_value=255,
+    ),
+    ToTensorV2()
+])
 
 # image_paths = glob.glob(os.path.join(r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-LP\test\images", "*"))
 image_paths = []
@@ -96,24 +96,22 @@ with open(os.path.join("model-runs", filename), "w") as file:
         name, ext = os.path.splitext(image_name)
         image = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
         end = tm.time()
-        loadingImageTimes.append(end-start)
+        loadingImageTimes.append(end - start)
         # print("Time spent loading image",end-start)
 
         start = tm.time()
         # lp_pred = lp_model(image)
-        lp_pred = lp_model(image,verbose=False)
+        lp_pred = lp_model(image, verbose=False)
         end = tm.time()
-        predictingLPTimes.append(end-start)
+        predictingLPTimes.append(end - start)
 
         # print("Time spent predicting LP",end-start)
 
-
-
-    # lp_pred[0].show()
+        # lp_pred[0].show()
         start = tm.time()
         lp_crop = LPutility.get_crop_lp(lp_pred, image)
         end = tm.time()
-        croppingLPTimes.append(end-start)
+        croppingLPTimes.append(end - start)
         # print("Time spent cropping LP",end-start)
 
         # debugging
@@ -132,12 +130,12 @@ with open(os.path.join("model-runs", filename), "w") as file:
 
             start = tm.time()
             # char_pred = char_model(lp_crop)
-            char_pred = char_model(lp_crop,verbose=False)
+            char_pred = char_model(lp_crop, verbose=False)
 
             pred, conf = LPutility.directPredict(char_pred)
-            conf = (conf.float()*1000).int().item()
+            conf = (conf.float() * 1000).int().item()
             end = tm.time()
-            predictingCharTimes.append(end-start)
+            predictingCharTimes.append(end - start)
             # print("Time spent predicting characters",end-start)
             # print("----")
             # print(pred)
@@ -149,21 +147,20 @@ with open(os.path.join("model-runs", filename), "w") as file:
             file.write(f"{pred},{name},{conf}\n")
             count += 1
             endglobal = tm.time()
-            globalrunTimes.append(endglobal-startglobal)
+            globalrunTimes.append(endglobal - startglobal)
             if count % 1000 == 0:
                 # end = time.time()
                 # print("Time spent avg",end-start/count)
                 # start = time.time()
                 print(f"Finished prediction {count}")
                 print(f"""
-                Average time loading image: {sum(loadingImageTimes)/len(loadingImageTimes)}
-                Average time predicting LP: {sum(predictingLPTimes)/len(predictingLPTimes)}
-                Average time cropping LP: {sum(croppingLPTimes)/len(croppingLPTimes)}
-                Average time predicting Char: {sum(predictingCharTimes)/len(predictingCharTimes)}
-                Average time running everything: {sum(globalrunTimes)/len(globalrunTimes)}
+                Average time loading image: {sum(loadingImageTimes) / len(loadingImageTimes)}
+                Average time predicting LP: {sum(predictingLPTimes) / len(predictingLPTimes)}
+                Average time cropping LP: {sum(croppingLPTimes) / len(croppingLPTimes)}
+                Average time predicting Char: {sum(predictingCharTimes) / len(predictingCharTimes)}
+                Average time running everything: {sum(globalrunTimes) / len(globalrunTimes)}
                 """)
-print(f"Results written to model-runs/{filename}")        
+print(f"Results written to model-runs/{filename}")
 
 if sys.platform == "win32":
     pathlib.PosixPath = temp
-        

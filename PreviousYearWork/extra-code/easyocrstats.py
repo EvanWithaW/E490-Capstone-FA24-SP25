@@ -1,6 +1,3 @@
-
-
-
 truth_f = open("../test_set/ground-truth-test-set.csv")
 # pred_f = open("easyocr-test-set-cropped.csv")
 pred_f = open("../test_set/openalpr_test_set_whole.csv")
@@ -14,14 +11,14 @@ false = 0
 
 for entry in data:
     image, read, confidence = entry.split(",")
-    data_dict[image.strip()] = {"read":read, "conf":confidence}
+    data_dict[image.strip()] = {"read": read, "conf": confidence}
 
 for entry in data_truth:
     image, read = entry.split(",")
-    
-    truth_dict[image.strip()] = {"read":read}
 
-for key, data in truth_dict.items():    
+    truth_dict[image.strip()] = {"read": read}
+
+for key, data in truth_dict.items():
     if truth_dict[key]["read"].strip() == data_dict[key]["read"].strip():
         true += 1
     else:

@@ -1,4 +1,3 @@
-from ultralytics import YOLO
 import onnx2torch
 import torch
 

@@ -1,7 +1,6 @@
-import os
 import glob
+import os
 import shutil
-
 
 folder = r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\MULTIPLE-PLATES-WHOLE\obj_train_data"
 txt_paths = glob.glob(os.path.join(folder, "*.txt"))
@@ -14,11 +13,11 @@ for path in txt_paths:
             multiple += 1
             move = True
 
-    if move:    
+    if move:
         base, file = os.path.split(path)
         name, ext = os.path.splitext(file)
         if os.path.exists(path):
             shutil.move(path, os.path.join(move_folder, file))
-        shutil.move(os.path.join(folder, name+".jpg"), os.path.join(move_folder, name+".jpg"))
+        shutil.move(os.path.join(folder, name + ".jpg"), os.path.join(move_folder, name + ".jpg"))
 
 print(multiple)

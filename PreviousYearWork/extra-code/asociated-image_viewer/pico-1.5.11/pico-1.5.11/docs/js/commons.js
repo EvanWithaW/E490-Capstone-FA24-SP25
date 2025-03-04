@@ -11,9 +11,9 @@ import toggleNavigation from './src/toggle-navigation';
 
 // Theme switcher
 themeSwitcher.addButton({
-  tag: 'BUTTON',
-  class: 'contrast switcher theme-switcher',
-  target: 'body',
+    tag: 'BUTTON',
+    class: 'contrast switcher theme-switcher',
+    target: 'body',
 });
 themeSwitcher.init();
 

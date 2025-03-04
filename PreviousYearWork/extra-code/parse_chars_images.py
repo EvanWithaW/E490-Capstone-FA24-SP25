@@ -1,4 +1,3 @@
-import os
 import json
 
 
@@ -23,7 +22,6 @@ test_images = []
 with open(r"D:\v2x-11-30-data\11-30-Parsed\TRAIN-TEST\TRAIN-CHAR\test\test-images.txt", "r") as file:
     lines = file.readlines()
     test_images = [line.strip().split(".")[0] for line in lines]
-
 
 train_images = {}
 for key, value in label_dict.items():

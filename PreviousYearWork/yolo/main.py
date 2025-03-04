@@ -4,9 +4,10 @@
 # Inference using custom trained model
 
 
-import torch
 import glob
 import os
+
+import torch
 
 model = torch.hub.load('ultralytics/yolov5', 'custom', 'yolov5/runs/train/exp4/weights/LPbest.pt')
 
@@ -14,12 +15,12 @@ model = torch.hub.load('ultralytics/yolov5', 'custom', 'yolov5/runs/train/exp4/w
 # model.load_state_dict(torch.load('yolov5/runs/train/exp4/weights/LPbest.pt')['model'].state_dict())
 
 # set for inference
-model.eval()    
+model.eval()
 
 image_files = glob.glob(os.path.join('images', '*.*'))
 images = []
 for file in image_files:
-    images.append(file.split("\\")[1])                  
+    images.append(file.split("\\")[1])
 print(images)
 
 # img = "images/LP.jpg"
@@ -29,4 +30,3 @@ for img in image_files:
     results = model(img)
     results.show()
     print(results.pandas().xyxy[0])
-

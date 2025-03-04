@@ -1,14 +1,15 @@
 import os
 import sys
-import PreviousYearWork.scripts.utility as utils
 from difflib import SequenceMatcher as SM
+
+import PreviousYearWork.scripts.utility as utils
 
 
 def check_for_special(label, pred):
     """
         Checks for additional characters added to the license plate number label
     """
-        ### Added checking:
+    ### Added checking:
     # prepend: 
     #   CA(plate type: AHNR) 
     #   PV,TP,MWRT(on plate) (plate type: ATNA)
@@ -23,11 +24,11 @@ def check_for_special(label, pred):
     special = ["BU", "TA", "VT", "PH", "HR", "MB", "CA", "PV", "TP", "SB", "SM", "ST", "SP", ".", "-", "+", "&", "AMB"]
     correct_pred = False
 
-    if label[:3] == "AMB" and (len(pred)+3 == len(label)):
-        
+    if label[:3] == "AMB" and (len(pred) + 3 == len(label)):
+
         if pred == label[3:]:
             correct_pred = True
-    elif label[:2] in special and (len(pred)+2 == len(label)):
+    elif label[:2] in special and (len(pred) + 2 == len(label)):
         if pred == label[2:]:
             correct_pred = True
     elif label[0] == "&":
@@ -42,7 +43,7 @@ def check_for_special(label, pred):
     elif "+" in label:
         if label.replace("+", "") == pred:
             correct_pred = True
-    
+
     return correct_pred
 
 
@@ -63,10 +64,10 @@ def check_results_capstone(prediction_path):
             split_line = line.strip().split(",")
             label, PRED_REG, PRED_INV, PRED_HE, PRED_INV_HE, image = split_line
             pred = PRED_HE
-            
+
             if check_for_special(label, pred):
                 correct += 1
-            else:         
+            else:
                 if pred == label:
                     correct += 1
                 else:
@@ -97,12 +98,12 @@ def check_results(results_path, label_dict):
             split_line = line.strip().split(",")
             pred, image, conf = split_line
             label = label_dict[image]
-            
+
             if int(conf) < 900:
                 manual += 1
-                num_records-=1
+                num_records -= 1
             else:
-                auto +=1
+                auto += 1
                 if check_for_special(label, pred):
                     correct += 1
                 else:
@@ -117,7 +118,7 @@ def check_results(results_path, label_dict):
                             different_length += 1
     return (correct, incorrect, num_records, different_length, incorrect_but_train, manual, auto)
 
-                    
+
 if len(sys.argv) < 2:
     print("Incorrect Arguments. Provide either CAPSTONE for capstone results or a path for a runs file")
     sys.exit()
@@ -134,8 +135,10 @@ if test_type == "CAPSTONE":
         print("Capstone file paths incorrect or the files do not exist.")
         sys.exit()
 
-    correct_full, incorrect_full, num_records_full, different_length_full, incorrect_but_train_full = check_results_capstone(capstone_full_path)
-    correct_small, incorrect_small, num_records_small, different_length_small, incorrect_but_train_small = check_results_capstone(capstone_small_path)
+    correct_full, incorrect_full, num_records_full, different_length_full, incorrect_but_train_full = check_results_capstone(
+        capstone_full_path)
+    correct_small, incorrect_small, num_records_small, different_length_small, incorrect_but_train_small = check_results_capstone(
+        capstone_small_path)
 
     print("CAPSTONE FINAL TEST RESULTS")
     print("Full Test")
@@ -167,13 +170,14 @@ else:
     with open(label_file_path, "r") as file:
         label_dict = utils.create_label_dict(file.readlines())
 
-    correct, incorrect, num_records, different_length, incorrect_but_train, manual_cnt, auto_cnt = check_results(results_path, label_dict)
-    
+    correct, incorrect, num_records, different_length, incorrect_but_train, manual_cnt, auto_cnt = check_results(
+        results_path, label_dict)
+
     print("------------------------------------------")
     print("Results")
     print("------------------------------------------")
     print(f"Auto Percentage LPs correct: {(correct / num_records) * 100 :0.5f}%")
-    print(f"Automation Rate: {auto_cnt/(auto_cnt+manual_cnt)*100 :0.5f}%")
+    print(f"Automation Rate: {auto_cnt / (auto_cnt + manual_cnt) * 100 :0.5f}%")
     print(f"Auto Correct/Total: {correct}/{num_records}")
     print()
     print("Incorrect: ", incorrect)
