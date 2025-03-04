@@ -10,8 +10,6 @@ results_df = pd.read_csv(results_path)
 results_dict = {row["IMAGE"]: (row["PRED"], row["CONF"]) for _, row in results_df.iterrows()}
 
 
-# print(next(iter(results_dict.items())))
-
 def extract_image_name(view):
     image = view.rsplit('/')[-1]
     return image.split('.jpg')[0]
@@ -32,13 +30,13 @@ for ufm_id, vals in ufm_dict.items():  # val is image1: name, image2: name, etc.
         if key2.startswith("IMAGE"):
             image_id = vals[key2]
             if image_id in results_dict:
-                sorted_results_dict.setdefault(ufm_id, []).append(results_dict[image_id])
+                sorted_results_dict.setdefault(ufm_id, []).append((image_id, *results_dict[image_id]))
 
-# print(next(iter(sorted_results_dict.items())))    
+print(next(iter(sorted_results_dict.items())))    
 
 filtered_results_dict = {}  # each ufm_id row with only the highest confidence for the (pred,conf) pairs
 for ufm_id, tuples in sorted_results_dict.items():
-    filtered_results_dict[ufm_id] = max(tuples, key=lambda x: x[1])
+    filtered_results_dict[ufm_id] = max(tuples, key=lambda x: x[2])
 
 tp, fp, tn, fn = 0, 0, 0, 0
 manual, auto = 0, 0
@@ -50,8 +48,8 @@ for ufm_id, vals in ufm_dict.items():
     else:
         present += 1
     lp_label = vals["PLATE_READ"]
-    lp_pred = filtered_results_dict[ufm_id][0]
-    lp_conf = filtered_results_dict[ufm_id][1]
+    lp_pred = filtered_results_dict[ufm_id][1]
+    lp_conf = filtered_results_dict[ufm_id][2]
     if lp_conf < 910:
         manual += 1
         if lp_label == lp_pred:
