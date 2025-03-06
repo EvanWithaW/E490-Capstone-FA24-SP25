@@ -4,52 +4,53 @@ import pandas as pd
 
 results_path = sys.argv[1]
 label_path = sys.argv[2]
+
 label_df = pd.read_csv(label_path)
-
 results_df = pd.read_csv(results_path)
-results_dict = {row["IMAGE"]: (row["PRED"], row["CONF"]) for _, row in results_df.iterrows()}
-
 
 def extract_image_name(view):
     image = view.rsplit('/')[-1]
     return image.split('.jpg')[0]
 
-
+ # create a label dictionary based on the csv (ALPRPlateExport11-30-23.csv) with only the plate read info and various image angles
 ufm_dict = label_df.set_index("UFM_ID")[["PLATE_READ", "IMAGE1", "IMAGE2", "IMAGE3", "IMAGE4"]].to_dict(orient="index")
+# create a dictionary based on the results of our model's predictions containing the image name, the prediction, and the confidence
+results_dict = {row["IMAGE"]: (row["PRED"], row["CONF"]) for _, row in results_df.iterrows()}
 
+# rename the image values in the ufm dict to only contain the relevant part 
+# (e.g. http://matip05e.massaets.com/TxnViewer/images/20231127/R0010/C0069/090005_1701090002939F02_331.jpg -> 090005_1701090002939F02_331.jpg)
 for key, val in ufm_dict.items():
     for key2, val2 in val.items():
         if (key2.startswith("IMAGE") and type(val2) == str):
             val[key2] = extract_image_name(val2)
 
-# for each image in every ufm id row, search the results dict for matching image, if/when found, append (pred, conf) to the new ufm dict. now we have up to 4 pred,conf pairs for every row
-
-sorted_results_dict = {}  # (ufm_id, [(prediction, conf),(prediction, conf),...]) for each available image angle
+# create a dict that contains the ufm id as the key and a tuple of the image id (IMAGE1, IMAGE2, IMAGE3, or IMAGE4 for each ufm id), prediction, and confidence as vals
+sorted_results_dict = {}
 for ufm_id, vals in ufm_dict.items():  # val is image1: name, image2: name, etc. and plate read
     for key2, val2 in vals.items():
         if key2.startswith("IMAGE"):
             image_id = vals[key2]
+            
+            # check to see if the image id is present in the results dict before appending it to the final dict
             if image_id in results_dict:
-                sorted_results_dict.setdefault(ufm_id, []).append((image_id, *results_dict[image_id]))
+                pred, conf = results_dict[image_id]
 
-print(next(iter(sorted_results_dict.items())))    
-
-filtered_results_dict = {}  # each ufm_id row with only the highest confidence for the (pred,conf) pairs
-for ufm_id, tuples in sorted_results_dict.items():
-    filtered_results_dict[ufm_id] = max(tuples, key=lambda x: x[2])
+                # populate the sorted dict with ufm id as the key and tuple of the image id, prediction, and confidence as vals
+                if ufm_id not in sorted_results_dict or conf > sorted_results_dict[ufm_id][2]:
+                    sorted_results_dict[ufm_id] = (image_id, pred, conf)
 
 tp, fp, tn, fn = 0, 0, 0, 0
 manual, auto = 0, 0
 missing, present = 0, 0
 for ufm_id, vals in ufm_dict.items():
-    if ufm_id not in filtered_results_dict:
+    if ufm_id not in sorted_results_dict:
         missing += 1
         continue
     else:
         present += 1
     lp_label = vals["PLATE_READ"]
-    lp_pred = filtered_results_dict[ufm_id][1]
-    lp_conf = filtered_results_dict[ufm_id][2]
+    lp_pred = sorted_results_dict[ufm_id][1]
+    lp_conf = sorted_results_dict[ufm_id][2]
     if lp_conf < 910:
         manual += 1
         if lp_label == lp_pred:
