@@ -3,3 +3,4 @@ runs/
 /modelWeights/
 *.csv
 PreviousYearWork/scripts/__pycache__*
+lp_metrics/__pycache__

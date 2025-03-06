@@ -9,7 +9,7 @@ def merge_data(label_df: pd.DataFrame, pred_df: pd.DataFrame) -> pd.DataFrame:
     # create a label dictionary based on the csv (ALPRPlateExport11-30-23.csv) with only the plate read info and various image angles
     ufm_dict = label_df.set_index("UFM_ID")[["PLATE_READ", "IMAGE1", "IMAGE2", "IMAGE3", "IMAGE4"]].to_dict(orient="index")
     # create a dictionary based on the results of our model's predictions containing the image name, the prediction, and the confidence
-    results_dict = {row["IMAGE"]: (row["PRED"], row["CONF"]) for _, row in results_df.iterrows()}
+    results_dict = {row["IMAGE"]: (row["PRED"], row["CONF"]) for _, row in pred_df.iterrows()}
 
     # rename the image values in the ufm dict to only contain the relevant part 
     # (e.g. http://matip05e.massaets.com/TxnViewer/images/20231127/R0010/C0069/090005_1701090002939F02_331.jpg -> 090005_1701090002939F02_331.jpg)
