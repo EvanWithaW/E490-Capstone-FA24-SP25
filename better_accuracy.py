@@ -1,9 +1,8 @@
 import sys
-
 import pandas as pd
 
-results_path = sys.argv[1]
-label_path = sys.argv[2]
+label_path = sys.argv[1]
+results_path = sys.argv[2]
 
 label_df = pd.read_csv(label_path)
 results_df = pd.read_csv(results_path)
@@ -51,7 +50,7 @@ for ufm_id, vals in ufm_dict.items():
     lp_label = vals["PLATE_READ"]
     lp_pred = sorted_results_dict[ufm_id][1]
     lp_conf = sorted_results_dict[ufm_id][2]
-    if lp_conf < 910:
+    if lp_conf < 800:
         manual += 1
         if lp_label == lp_pred:
             fn += 1
