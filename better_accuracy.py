@@ -3,6 +3,7 @@ import pandas as pd
 
 label_path = sys.argv[1]
 results_path = sys.argv[2]
+confidence = int(sys.argv[3])
 
 label_df = pd.read_csv(label_path)
 results_df = pd.read_csv(results_path)
@@ -50,7 +51,7 @@ for ufm_id, vals in ufm_dict.items():
     lp_label = vals["PLATE_READ"]
     lp_pred = sorted_results_dict[ufm_id][1]
     lp_conf = sorted_results_dict[ufm_id][2]
-    if lp_conf < 800:
+    if lp_conf < confidence:
         manual += 1
         if lp_label == lp_pred:
             fn += 1
@@ -68,4 +69,7 @@ print(f"Precision: {tp / (tp + fp):.4f}")
 print(f"Recall: {tp / (tp + fn):.4f}")
 print(f"F1 Score: {2 * (tp / (tp + fp)) * (tp / (tp + fn)) / ((tp / (tp + fp)) + (tp / (tp + fn))):.4f}")
 print(f"Automation Rate: {auto / (auto + manual):.4f}")
-print(f"Missing ratio: {missing / (missing + present):.4f}")
+print(f"Automatic Plates Read: {auto}")
+print(f"Manual Plates Read: {manual}")
+print(f"Total Images: {auto+manual}")
+# print(f"Missing ratio: {missing / (missing + present):.4f}")
