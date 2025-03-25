@@ -4,3 +4,5 @@ runs/
 *.csv
 
 **/__pycache__/
+
+.idea/
