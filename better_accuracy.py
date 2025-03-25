@@ -12,13 +12,19 @@ def extract_image_name(view):
     image = view.rsplit('/')[-1]
     return image.split('.jpg')[0]
 
+label_df = pd.read_csv(label_path, low_memory=False)
+results_df = pd.read_csv(results_path)
+
+# Ensure UFM_ID is unique by dropping duplicates
+label_df = label_df.drop_duplicates(subset="UFM_ID")
+
  # create a label dictionary based on the csv (ALPRPlateExport11-30-23.csv) with only the plate read info and various image angles
 ufm_dict = label_df.set_index("UFM_ID")[["PLATE_READ", "IMAGE1", "IMAGE2", "IMAGE3", "IMAGE4"]].to_dict(orient="index")
 # create a dictionary based on the results of our model's predictions containing the image name, the prediction, and the confidence
 results_dict = {row["IMAGE"]: (row["PRED"], row["CONF"]) for _, row in results_df.iterrows()}
 
 # rename the image values in the ufm dict to only contain the relevant part 
-# (e.g. http://matip05e.massaets.com/TxnViewer/images/20231127/R0010/C0069/090005_1701090002939F02_331.jpg -> 090005_1701090002939F02_331.jpg)
+# (e.g. http://matip05e.massaets.com/TxnViewer/images/20231127/R0010/C0069/090005_1701090002939F02_331.jpg -> 0py90005_1701090002939F02_331.jpg)
 for key, val in ufm_dict.items():
     for key2, val2 in val.items():
         if (key2.startswith("IMAGE") and type(val2) == str):
