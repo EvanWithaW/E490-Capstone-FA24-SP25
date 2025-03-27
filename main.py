@@ -21,8 +21,8 @@ if sys.platform == "win32":
     temp = pathlib.PosixPath
     pathlib.PosixPath = pathlib.WindowsPath
 
-lp_weights = os.path.join("modelWeights", "LPbest.pt")
-char_weights = os.path.join("modelWeights", "Charbest.pt")
+lp_weights = os.path.join("modelWeights", "LPbest.engine")
+char_weights = os.path.join("modelWeights", "Charbest.engine")
 # resnet_weights = os.path.join("weights", "resnet-classifier.pth")
 
 # device = torch.device("mps")
@@ -42,8 +42,10 @@ char_model = YOLO(char_weights)
 # resnet_classifier.load_state_dict(torch.load(resnet_weights, map_location=torch.device('cpu')))
 # lp_model.eval()
 # char_model.eval()`
-lp_model.to(device)
-char_model.to(device)
+
+# cant do this for .engine; can for CUDA/MPS
+# lp_model.to(device)
+# char_model.to(device)
 
 image_size = 32
 transforms = A.Compose([
@@ -101,7 +103,7 @@ with open(os.path.join("model-runs", filename), "w") as file:
 
         start = tm.time()
         # lp_pred = lp_model(image)
-        lp_pred = lp_model(image, verbose=False)
+        lp_pred = lp_model.predict(image, device=device, verbose=False)
         end = tm.time()
         predictingLPTimes.append(end - start)
 
@@ -130,7 +132,7 @@ with open(os.path.join("model-runs", filename), "w") as file:
 
             start = tm.time()
             # char_pred = char_model(lp_crop)
-            char_pred = char_model(lp_crop, verbose=False)
+            char_pred = char_model.predict(lp_crop, device=device, verbose=False)
 
             pred, conf = LPutility.directPredict(char_pred)
             conf = (conf.float() * 1000).int().item()
