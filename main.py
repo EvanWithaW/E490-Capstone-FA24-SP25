@@ -13,17 +13,8 @@ from ultralytics import YOLO
 
 import LPutility
 
-# Path issue fix: https://stackoverflow.com/questions/57286486/i-cant-load-my-model-because-i-cant-put-a-posixpath
-temp = ""
-if sys.platform == "win32":
-    import pathlib
-
-    temp = pathlib.PosixPath
-    pathlib.PosixPath = pathlib.WindowsPath
-
-lp_weights = os.path.join("modelWeights", "LPbest.engine")
-char_weights = os.path.join("modelWeights", "Charbest.engine")
-# resnet_weights = os.path.join("weights", "resnet-classifier.pth")
+lp_weights = os.path.join("modelWeights", "LPbest.pt")
+char_weights = os.path.join("modelWeights", "Charbest.pt")
 
 # device = torch.device("mps")
 if torch.backends.mps.is_available():
@@ -150,7 +141,7 @@ with open(os.path.join("model-runs", filename), "w") as file:
             count += 1
             endglobal = tm.time()
             globalrunTimes.append(endglobal - startglobal)
-            if count % 1000 == 0:
+            if count % 10000 == 0:
                 # end = time.time()
                 # print("Time spent avg",end-start/count)
                 # start = time.time()
@@ -162,7 +153,13 @@ with open(os.path.join("model-runs", filename), "w") as file:
                 Average time predicting Char: {sum(predictingCharTimes) / len(predictingCharTimes)}
                 Average time running everything: {sum(globalrunTimes) / len(globalrunTimes)}
                 """)
+                
 print(f"Results written to model-runs/{filename}")
-
-if sys.platform == "win32":
-    pathlib.PosixPath = temp
+print(f"Finished prediction {count}")
+print(f"""
+Average time loading image: {sum(loadingImageTimes) / len(loadingImageTimes)}
+Average time predicting LP: {sum(predictingLPTimes) / len(predictingLPTimes)}
+Average time cropping LP: {sum(croppingLPTimes) / len(croppingLPTimes)}
+Average time predicting Char: {sum(predictingCharTimes) / len(predictingCharTimes)}
+Average time running everything: {sum(globalrunTimes) / len(globalrunTimes)}
+""")
