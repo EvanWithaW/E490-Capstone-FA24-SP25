@@ -1,0 +1,6 @@
+Average time loading image: 0.038079856978357654
+Average time predicting LP: 0.010121350370654732
+Average time cropping LP: 0.0001781413562914167
+Average time predicting Char: 0.03678347050846555
+Average time running everything: 0.08538562150924708
+
