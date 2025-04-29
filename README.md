@@ -1,3 +1,13 @@
+# About #
+
+# Getting Started #
+python3 -m venv .venv
+source .venv/bin/activate
+
+
+
+
+
 # This project is a Work in Progress.
 
 ## The team is working on a automated license plate recognition (ALPR) system utilizing machine learning.
