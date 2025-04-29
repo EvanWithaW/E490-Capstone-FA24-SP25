@@ -71,11 +71,11 @@ for ufm_id, vals in ufm_dict.items():
         fp += 1
 
 print(f"\nPrecision: {tp / (tp + fp):.4f}")
-print(f"Automation Rate: {auto / (auto + manual):.4f}")
+print(f"Automation Rate: {auto / (auto + manual+1e-6):.4f}")
 print("")
-print(f"Accuracy: {(tp + tn) / (tp + tn + fp + fn):.4f}")
-print(f"Recall: {tp / (tp + fn):.4f}")
-print(f"F1 Score: {2 * (tp / (tp + fp)) * (tp / (tp + fn)) / ((tp / (tp + fp)) + (tp / (tp + fn))):.4f}")
+print(f"Accuracy: {(tp + tn) / (tp + tn + fp + fn+1e-6):.4f}")
+print(f"Recall: {tp / (tp + fn+1e-6):.4f}")
+print(f"F1 Score: {2 * (tp / (tp + fp+1e-6)) * (tp / (tp + fn+1e-6)) / ((tp / (tp + fp+1e-6)) + (tp / (tp + fn+1e-6))+1e-6):.4f}")
 print(f"Automatic Plates Read: {auto}")
 print(f"Manual Plates Read: {manual}")
 print(f"Total Images: {auto+manual}")
