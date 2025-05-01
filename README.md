@@ -12,7 +12,12 @@ This project is an **Automated License Plate Recognition (ALPR) system** designe
 
 
 ## Getting Started
-Clone the repository using this command:
+Note: in order to run this project, you will need independently generated model weights. We name the weights we use in the following way:
+- `LPBest` - __LP Localization__ model weights
+- `Charbest` - __Character Classification and Segmentation__ model weights
+
+In addition to model weights, this project requires a folder of image files and, if wanting to evaluate the accuracy of the model, a label file in .csv format. 
+Once you obtain these files, you may clone the repository using this command:
 ```bash
 git clone https://github.com/EvanWithaW/E490-Capstone-FA24-SP25
 ```
