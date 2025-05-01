@@ -1,6 +1,17 @@
-# About #
+# Automated License Plate Recognition System
+## About
 
-# Getting Started #
+This project is an **Automated License Plate Recognition (ALPR) system** designed as a capstone project for E490. The system uses computer vision and machine learning to identify and extract license plate numbers from images. It processes a batch of image files, makes predictions using a trained model, and exports the results to a CSV file for further analysis. Additionally, accuracy metrics can be generated for performance evaluation.
+
+### Key Features
+- Batch image processing for license plate recognition
+- Outputs predictions to a structured CSV format
+- Accuracy metrics for evaluating model performance
+- Modular and extensible codebase for future enhancements
+
+
+
+## Getting Started
 ```bash
 python3 -m venv .venv  
 source .venv/bin/activate
@@ -16,7 +27,7 @@ source .venv/bin/activate
 Our current design will include:
 
 - Efficient and fast machine learning models which can read license plate strings
-- Confidence gating system to flag possible wrong predictions
+- A Confidence value to flag possible wrong predictions
 - Generalized scripts and in-depth user manuals on how to use the system
 
 ## Project Structure
