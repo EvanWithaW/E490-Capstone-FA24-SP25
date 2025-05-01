@@ -12,12 +12,23 @@ This project is an **Automated License Plate Recognition (ALPR) system** designe
 
 
 ## Getting Started
+Clone the repository using this command:
 ```bash
-python3 -m venv .venv  
-source .venv/bin/activate
+git clone https://github.com/EvanWithaW/E490-Capstone-FA24-SP25
 ```
 
-
+Then, create a virtual environment to install the project dependencies:
+```bash
+python3 -m venv .venv  
+```
+Activate the environment once it has been created:
+```bash
+source .venv/bin/activate
+```
+Once you are inside the virtual environment, run this command from the home directory of the repository to install the project dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 
 # This project is a Work in Progress.
