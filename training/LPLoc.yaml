@@ -1,0 +1,8 @@
+path: /nfs/nfs8/home/scratch/ngoh/CapstoneDataset_preprocessed_split # dataset root dir
+train: train/images  # train images (relative to 'path') 4 images
+val: val/images  # val images (relative to 'path') 4 images
+test: images/test # test images (optional)
+
+# Classes (1 class)
+names:
+  0: license plate
