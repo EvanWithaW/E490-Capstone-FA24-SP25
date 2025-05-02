@@ -79,5 +79,6 @@ print(f"F1 Score: {2 * (tp / (tp + fp+1e-6)) * (tp / (tp + fn+1e-6)) / ((tp / (t
 print(f"Automatic Plates Read: {auto}")
 print(f"Manual Plates Read: {manual}")
 print(f"Total Images: {auto+manual}")
+print(f"TP TN FP FN: {tp} {tn} {fp} {fn}")
 print("")
 # print(f"Missing ratio: {missing / (missing + present):.4f}")
