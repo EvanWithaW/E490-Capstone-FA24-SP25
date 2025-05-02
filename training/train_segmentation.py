@@ -6,12 +6,11 @@ model = YOLO('yolo11s.pt')
 # This trains with the dataset given in LPD.yaml
 model.train(
     data='LPSeg.yaml',
-    epochs=300,
+    epochs=200,
     batch=16,
     imgsz=1280,
-    device=[0,1,2,3],
     workers=4,
-    patience=50,
+    patience=40,
     lr0=0.001,
     lrf=0.01,
     degrees=5.0,
@@ -27,7 +26,7 @@ model.train(
     mosaic=0.8,
     fraction=1.0,
     dropout=0.2,
-    mixup=0.1,
+    mixup=0.2,
     optimizer='AdamW',
     cos_lr=True,
     close_mosaic=10,
