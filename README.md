@@ -73,3 +73,13 @@ The result will be displayed on the command line. This file measures the followi
 - Automatic Plates Read
 - Manual Plates Read
 - Total Images Read
+
+
+### Troubleshooting Guide
+
+| Issue                 | Solution                                                                 |
+|-----------------------|--------------------------------------------------------------------------|
+| ModuleNotFoundError   | Run `pip install -r requirements.txt`.                                   |
+| Missing model weights | Ensure `LPBest`/`Charbest` are in `modelWeights/`.                       |
+| Path errors           | Use absolute paths (e.g., `/home/user/images/`, not `~/images/`).        |
+| Low accuracy          | Verify label file formatting or adjust confidence threshold.             |
