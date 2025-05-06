@@ -76,10 +76,10 @@ The result will be displayed on the command line. This file measures the followi
 
 
 ### Troubleshooting Guide
-
-| Issue                 | Solution                                                                 |
-|-----------------------|--------------------------------------------------------------------------|
-| ModuleNotFoundError   | Run `pip install -r requirements.txt`.                                   |
-| Missing model weights | Ensure `LPBest`/`Charbest` are in `modelWeights/`.                       |
-| Path errors           | Use absolute paths (e.g., `/home/user/images/`, not `~/images/`).        |
-| Low accuracy          | Verify label file formatting or adjust confidence threshold.             |
+| Issue                              | Solution                                                                 |
+|------------------------------------|--------------------------------------------------------------------------|
+| ModuleNotFoundError                | Run `pip install -r requirements.txt`.                                   |
+| Missing model weights              | Ensure `LPBest`/`Charbest` are in `modelWeights/`.                       |
+| Path errors                        | Use absolute paths (e.g., `/home/user/images/`, not `~/images/`).        |
+| Low accuracy                       | Verify label file formatting or adjust confidence threshold.             |
+| Division by zero error in `accuracy.py` | Ensure the label file matches the images used in the model run.     |
